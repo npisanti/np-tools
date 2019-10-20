@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<GUI>
+	<datasynth>
+		<gain>-18</gain>
+		<wave_smoothing>0.4</wave_smoothing>
+		<filter_cutoff>136</filter_cutoff>
+		<env_attack>50</env_attack>
+		<env_decay>400</env_decay>
+		<env_sustain>1</env_sustain>
+		<env_release>900</env_release>
+		<drift>0.05</drift>
+	</datasynth>
+	<wave_smoothing>0.3</wave_smoothing>
+	<mirror>
+		<active>1</active>
+		<horizontal>1</horizontal>
+		<vertical>1</vertical>
+	</mirror>
+	<monochrome>
+		<active>1</active>
+		<low>0.0357143</low>
+		<high>0.464286</high>
+	</monochrome>
+	<position>
+		<x>205</x>
+		<y>266</y>
+	</position>
+</GUI>
