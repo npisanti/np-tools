@@ -1,7 +1,7 @@
 
 wolframkit/bin/data/sequences.json
 wolframkit/bin/data/synths.json
-
+framescan/bin/data/frames/*
 
 # Some general ignore patterns
 
