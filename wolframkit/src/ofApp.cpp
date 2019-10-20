@@ -120,7 +120,6 @@ void ofApp::setup(){
     live.watch( synths, synthPath );
     
     //---------------------- audio setup -------------
-    engine.listDevices();
     engine.setDeviceID( device );
     engine.setup( 44100, 512, 3); 
         

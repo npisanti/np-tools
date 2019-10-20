@@ -1,6 +1,6 @@
 /*====================================================================
 
-	folderkit - companion drumkit for orca-c
+	masterbus - hub for all the instruments
   
 	Copyright (c) 2019 Nicola Pisanti <nicola@npisanti.com>
 
@@ -21,26 +21,12 @@
 
 #pragma once
 
-#define NUMSAMPLERS 8
-
 #include "ofMain.h"
-#include "ofxMidi.h"
 #include "ofxPDSP.h"
-#include "ofxOsc.h"
 #include "StereoDelay.h"
-#include "synth/WaveSynth.h"
-#include "effect/Chorus.h"
-#include "effect/Filter.h"
 #include "effect/BasiVerb.h"
-#include "effect/StereoDelay.h"
-#include "meter/RMS.h"
-
+#include "StereoRMS.h"
 #include "dynamics/Brickwall.h"
-
-#include "dynamics/Comp.h"
-
-#include "Library.h"
-#include "Sampler.h"
 #include "LiveParameters.h"
 
 
@@ -64,33 +50,22 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-        pdsp::Engine        engine;   
-        pdsp::osc::Input    osc;
+        pdsp::Engine engine;   
+        int device;
         
-        ofxOscSender        sender;
-          
+        np::meter::StereoRMS rms;
+        
         np::effect::BasiVerb  reverb;
-        np::effect::StereoDelay delays;
+        np::dynamics::Brickwall limiter;
         
         ofParameterGroup parameters;
         np::LiveParameters live;
-
-        motore::Sampler samplers [ NUMSAMPLERS ];
-        
-        np::dynamics::Brickwall limiter;
-        
-        np::dynamics::Compressor percbus;
-        
-        pdsp::LowCut delaycut;
-        
-        bool bDrawGui;
-        
-        motore::Library library;
-        
         std::string path;
-        int inputPort;
+        
+        ofxOscSender        sender;
         int outputPort;
         std::string outputIP;
-        int device;
+        
+        int clock;
         
 };

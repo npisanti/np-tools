@@ -29,7 +29,6 @@ void ofApp::setup(){
 
     bDrawGui = true;
 
-    osc.setVerbose( true );
     osc.openPort( inputPort );
     std::cout<<"[ folderkit ] receiving osc on port "<<inputPort<<"\n";
     
@@ -81,17 +80,9 @@ void ofApp::setup(){
         samplers[i].oscMapping( osc, address );
     }
     
-    // graphic setup---------------------------
-    ofSetVerticalSync(true);
-    ofDisableAntiAliasing();
-    ofBackground(0);
-    ofSetColor(ofColor(0,100,100));
-    ofNoFill();
-    ofSetLineWidth(1.0f);
-    ofSetFrameRate(60);
 
-    // GUI -----------------------------------
-    //gui.setup( "folderkit", path + "/settings.xml", 20, 20 );
+
+    // PARAMETERS ------------------------------
     parameters.setName("folderkit");
         for( size_t i=0; i<NUMSAMPLERS; ++i ){
             std::string name = "sampler ";
@@ -103,10 +94,7 @@ void ofApp::setup(){
         parameters.add( reverb.parameters );
         parameters.add( limiter.parameters );
     live.watch( parameters, path + "/settings.json");
-    
-    //gui.loadFromFile( path + "/settings.xml" );
-    //gui.minimizeAll();
- 
+
     // audio setup----------------------------
     engine.sequencer.play();
     engine.addOscInput ( osc );

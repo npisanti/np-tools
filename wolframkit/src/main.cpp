@@ -38,13 +38,6 @@ int main( int argc, char *argv[] ){
         app->outputIP = "localhost";
         app->device = 0;
 
-        std::string path = std::string( argv[1] );
-        
-        if( ! ofFilePath::isAbsolute( path )){
-            path = ofFilePath::getCurrentWorkingDirectory() + "/" + path;
-        }
-        path = ofFilePath::removeTrailingSlash( path );
-
         for( int i=1; i<argc; ++i ){
             std::string cmd = std::string( argv[i] );
 
@@ -61,7 +54,7 @@ int main( int argc, char *argv[] ){
                     app->outputPort = std::stoi( argv[i+1] );
                 }
             }
-            if( cmd == "--out-ip" || cmd == "-p" ){
+            if( cmd == "--out-address" || cmd == "-a" ){
                 if( i+1 < argc ){
                     app->outputIP = std::string( argv[i+1] );
                 }
@@ -83,6 +76,10 @@ int main( int argc, char *argv[] ){
                     }
                     app->synthPath=path;
                 }
+            }
+            if( cmd == "--list-devices" || cmd == "-l" ){
+                ofSoundStreamListDevices();
+                return 0;
             }
         }   
         
