@@ -27,22 +27,17 @@
 #include "ofxMidi.h"
 #include "ofxPDSP.h"
 #include "ofxOsc.h"
-#include "StereoDelay.h"
-#include "synth/WaveSynth.h"
-#include "effect/Chorus.h"
-#include "effect/Filter.h"
+
 #include "effect/BasiVerb.h"
 #include "effect/StereoDelay.h"
 #include "meter/RMS.h"
-
-#include "dynamics/Brickwall.h"
-
 #include "dynamics/Comp.h"
 
 #include "Library.h"
 #include "Sampler.h"
+#include "Percussion.h"
 #include "LiveParameters.h"
-
+#include "Karplus.h"
 
 class ofApp : public ofBaseApp{
 
@@ -76,8 +71,11 @@ class ofApp : public ofBaseApp{
         np::LiveParameters live;
 
         motore::Sampler samplers [ NUMSAMPLERS ];
+        std::vector<np::synth::Percussion> percs;
+        np::folderkit::Karplus karplus;
         
-        np::dynamics::Brickwall limiter;
+        pdsp::ParameterAmp enableReverb;
+        pdsp::ParameterAmp enableDelays;
         
         np::dynamics::Compressor percbus;
         

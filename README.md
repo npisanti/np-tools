@@ -7,6 +7,7 @@ Repository for personal tools. Mostly openFrameworks based, they will require so
 - `folderkit` : headless sample player to use with ORCA
 - `wolframkit` : wolfram automata rhytmic playground
 - `masterbus` : reverb + limiter bus with optional RMS to OSC 
+- `pixelscript` : 2d graphics scripting playground
 
 All is very work in progress.
 

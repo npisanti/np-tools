@@ -41,22 +41,20 @@ void ofApp::setup(){
     library.init( path ) ;
     
     // --------------------------------------------
-    200.0f >> delaycut.in_freq();
     
+    percbus.ch(0) >> engine.audio_out(0);
+    percbus.ch(1) >> engine.audio_out(1);
+
+    200.0f >> delaycut.in_freq();    
     delaycut.ch(0) >> delays.ch(0);
     delaycut.ch(1) >> delays.ch(1);   
-
     delays.out("send") >> reverb;
-    
-    reverb.ch(0) >> limiter.ch(0);
-    reverb.ch(1) >> limiter.ch(1);
+    delays.ch(0) >> enableDelays.ch(0) >> engine.audio_out(0);
+    delays.ch(1) >> enableDelays.ch(1) >> engine.audio_out(1);
+        
+    reverb.ch(0) >> enableReverb.ch(0) >> engine.audio_out(0);
+    reverb.ch(1) >> enableReverb.ch(1) >> engine.audio_out(1);
  
-    delays.ch(0) >> limiter.ch(0);
-    delays.ch(1) >> limiter.ch(1);
-    
-    limiter.ch(0) >> engine.audio_out(0);
-    limiter.ch(1) >> engine.audio_out(1);
-    
     for( int i=0; i<NUMSAMPLERS; ++i ){
         std::cout<< "initializating sampler "<<i<<"\n";
         samplers[i].linkToLibrary( library );    
@@ -64,15 +62,27 @@ void ofApp::setup(){
         samplers[i].out("delay") >> delays.ch(0);
         samplers[i].out("delay") >> delays.ch(1);
         samplers[i].out("rev") >> reverb;
-        samplers[i].ch(0) >> limiter.ch(0);
-        samplers[i].ch(1) >> limiter.ch(1);
+        samplers[i].ch(0) >> percbus.ch(0);
+        samplers[i].ch(1) >> percbus.ch(1);
     }
 
+    percs.resize(4);
+    for( size_t i=0; i<percs.size(); ++i ){
+        percs[i].out("send_delay") >> delays.ch(0);
+        percs[i].out("send_delay") >> delays.ch(1);
+        percs[i].out("send_rev") >> reverb;
+        percs[i].out("L") >> percbus.ch(0);
+        percs[i].out("R") >> percbus.ch(1);
+    }
+    
+    karplus.setup( engine );
     
     std::vector<std::string> addresses = { "a", "b", "c", "d", "e", "f", "g", "h" };
+    std::vector<std::string> percAdd = { "x", "y", "z", "w" };
 
     // OSC mapping -----------------------------
     osc.linkTempo( "/orca/bpm" );
+    karplus.oscMapping( osc );
 
     for(size_t i=0; i<NUMSAMPLERS; ++i ){
         std::string address = "/";
@@ -80,37 +90,40 @@ void ofApp::setup(){
         samplers[i].oscMapping( osc, address );
     }
     
-
-
+    for( size_t i=0; i<percs.size(); ++i ){
+        std::string address = "/";
+        address += percAdd[i];
+        osc.out_trig( address, 0 ) * 16.0f >> percs[i];
+    }
+    
     // PARAMETERS ------------------------------
     parameters.setName("folderkit");
         for( size_t i=0; i<NUMSAMPLERS; ++i ){
-            std::string name = "sampler ";
+            std::string name = "sam";
             name += addresses[i];
             parameters.add( samplers[i].label( name ) );
         }
-        parameters.add( percbus.label( "perc bus comp") );
+        for( size_t i=0; i<percs.size(); ++i ){
+            std::string name = "per";
+            name += percAdd[i];
+            parameters.add( percs[i].label( name ) );
+        }
+        parameters.add( karplus.parameters );
+        parameters.add( percbus.label( "bus_comp") );
+        parameters.add( enableReverb.set("enable_reverb", 0.0f, 0.0f, 1.0f ));
         parameters.add( delays.parameters );
+        parameters.add( enableDelays.set("enable_delays", 0.0f, 0.0f, 1.0f ));        
         parameters.add( reverb.parameters );
-        parameters.add( limiter.parameters );
+        
     live.watch( parameters, path + "/settings.json");
 
     // audio setup----------------------------
     engine.sequencer.play();
     engine.addOscInput ( osc );
 
-    const auto & devices = engine.listDevices();
     engine.setDeviceID( device ); 
+    engine.setup( 44100, 512, 2);    
     
-    if(devices[device].outputChannels == 4 ){
-        limiter.ch(0) >> engine.audio_out(2);
-        limiter.ch(1) >> engine.audio_out(3);
-        
-        engine.setChannels( 0, 4 );
-        engine.setup( 44100, 512, 2);    
-    }else{
-        engine.setup( 44100, 512, 2);    
-    }
 }
 
 //--------------------------------------------------------------
