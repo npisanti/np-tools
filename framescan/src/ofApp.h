@@ -56,9 +56,12 @@ class ofApp : public ofBaseApp{
         ofx::dotfrag::Live invertfrag;
         ofParameterGroup invert;
         ofParameter<bool> iActive;
-        ofParameter<float> iThreshold;
-        ofParameter<float> iSmooth;
+        ofParameter<float> iLow;
+        ofParameter<float> iHigh;
+        ofParameter<float> iBorder;
         
+        
+        ofx::dotfrag::Live borderfrag;
         
         ofxPanel gui;
         

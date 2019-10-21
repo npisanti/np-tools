@@ -1,14 +1,15 @@
 
 #ifdef GL_ES
-precision mediump float;
+precision highp float;
 #endif
 
 uniform vec2 u_resolution;
 
 uniform sampler2D u_tex0;
 
-uniform float u_threshold;
-uniform float u_smooth;
+uniform float u_low;
+uniform float u_high;
+uniform float u_border;
 
 void main(){
     
@@ -19,8 +20,8 @@ void main(){
     
     float luminance = color.r*0.299 + color.g*0.587 + color.b*0.114;	
     
-    float alpha = smoothstep( u_threshold-u_smooth, u_threshold+u_smooth, luminance );
-
-    gl_FragColor = vec4( color, alpha);
+    float alpha = smoothstep( u_low, u_high, luminance );
+    
+    gl_FragColor = vec4( vec3(1.0), alpha );
   
 }

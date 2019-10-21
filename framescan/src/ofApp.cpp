@@ -21,8 +21,8 @@
 
 #include "ofApp.h"
 
-#define CAMW 640
-#define CAMH 480
+#define CAMW 1280
+#define CAMH 720
 #define CUTMARGIN 20
 
 //--------------------------------------------------------------
@@ -45,15 +45,20 @@ void ofApp::setup(){
     fbo.allocate( cam.getWidth(), cam.getHeight() );
   
     invertfrag.name( "invert cut" );
-    invertfrag.uniform( iThreshold.set("u_threshold", 0.5f, 0.0f, 1.0f) );
-    invertfrag.uniform( iSmooth.set("u_smooth", 0.0f, 0.0f, 0.01f) );
+    invertfrag.uniform( iLow.set("u_low", 0.5f, 0.0f, 1.0f) );
+    invertfrag.uniform( iHigh.set("u_high", 1.0f, 0.0f, 1.0f) );
     invertfrag.load( ofToDataPath("invertcut.frag") );
     
-    gui.setup( "GUI", "settings.xml", 20, 20 );
+    borderfrag.name( "border" );
+    borderfrag.uniform( iBorder.set("u_border", 0.05f, 0.0f, 0.4f) );
+    borderfrag.load( ofToDataPath("border.frag") );
+    
+    gui.setup( "GUI", "settings.xml", ofGetWidth()-220, 20 );
     gui.add( mirror.parameters );
     gui.add( mono.parameters );
     gui.add( hsb.parameters );
     gui.add( invertfrag.parameters  );
+    gui.add( borderfrag.parameters  );
     gui.add( cutx.set("cut x", 700, 0, CAMW ));
     gui.add( cuty.set("cut y", 160, 0, CAMH ));
     gui.add( cutw.set("cut width", 200, 0, 640 ) );
@@ -75,6 +80,8 @@ void ofApp::setup(){
         ofClear( 0, 0, 0, 0 );
     cutfbo.end();
     
+    borderfrag.allocate( cutfbo );
+    
     ofBackground( 0 );
     
     cursor = 0.0f;
@@ -93,9 +100,13 @@ void ofApp::update(){
         fbo.end();
         
         mirror.apply( fbo );
-        mono.apply( fbo );
-        hsb.apply( fbo );
-        invertfrag.apply( fbo );
+        if( ! invertfrag.active ){
+            mono.apply( fbo );
+            hsb.apply( fbo );          
+        }else{
+            invertfrag.apply( fbo );
+        }
+            
     }
 }
 
@@ -122,13 +133,13 @@ void ofApp::draw(){
         
         case 1:
             if( ! frames.empty() ){
-                frames.front().draw( cutx, cuty );
+                frames.back().draw( cutx, cuty );
             }                    
         break;
         
         case 2:
             if( ! frames.empty() ){
-                frames.back().draw( cutx, cuty );
+                frames.front().draw( cutx, cuty );
             }
         break;
     }
@@ -190,13 +201,13 @@ void ofApp::draw(){
         
         case 1: case 2:
             if( ! frames.empty() ){
-                frames.front().draw( 0, 0 );
+                frames.back().draw( 0, 0 );
             }                    
         break;
         
         case 3: case 4:
             if( ! frames.empty() ){
-                frames.back().draw( 0, 0 );
+                frames.front().draw( 0, 0 );
             }
         break;
     }
@@ -227,11 +238,14 @@ void ofApp::draw(){
 }
 
 void ofApp::offcut(){
+    ofDisableAlphaBlending();
     cutfbo.begin();
         ofClear( 0, 0, 0, 0 );
         ofSetColor(255);
         precut.draw( offsetX - CUTMARGIN, offsetY - CUTMARGIN );
     cutfbo.end();
+    borderfrag.apply( cutfbo );
+    ofEnableAlphaBlending();
 }
 
 //--------------------------------------------------------------
@@ -239,11 +253,13 @@ void ofApp::keyPressed(int key){
 
     switch( key ){
         case 'c': case ' ':
+            ofDisableAlphaBlending();
             precut.begin();
                 ofClear( 0, 0, 0, 0 );
                 ofSetColor(255);
                 fbo.draw( -cutx +CUTMARGIN, -cuty +CUTMARGIN );
             precut.end();
+            ofEnableAlphaBlending();
             
             offsetX = 0;
             offsetY = 0;
