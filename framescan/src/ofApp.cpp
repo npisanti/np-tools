@@ -121,10 +121,12 @@ void ofApp::draw(){
         case 1: case 2:
             if( invertfrag.active ){
                 ofEnableBlendMode(OF_BLENDMODE_ADD);
+                ofSetColor( 255, 0, 0 );
             }else{
                 ofEnableBlendMode(OF_BLENDMODE_MULTIPLY);
+                ofSetColor( 180 );
             }
-            ofSetColor( 180 );
+            
         break;
     }
 
@@ -181,19 +183,34 @@ void ofApp::draw(){
     
     gui.draw();
     
+    // ------------ draws cut preview -----
+    
     ofTranslate( fbo.getWidth() + 20, 20 );
     
-    ofSetColor( 255 );
-    cutfbo.draw( 0, 0 );
-
-
+    switch( cutoverlay ){
+        case 2 : case 4: break;
+        
+        case 1 : case 3:
+            ofSetColor(255, 0, 0);
+            cutfbo.draw( 0, 0 );
+        break;
+        
+        default : 
+            ofSetColor( 255 );
+            cutfbo.draw( 0, 0 );
+        break;
+    }
+    
     if( cutoverlay==1 || cutoverlay==3 ){
         if( invertfrag.active ){
             ofEnableBlendMode(OF_BLENDMODE_ADD);
+            ofSetColor( 0, 255, 0 );
         }else{
             ofEnableBlendMode(OF_BLENDMODE_MULTIPLY);
+            ofSetColor( 180 );
         }
-        ofSetColor( 180 );
+    }else{
+        ofSetColor( 255 );
     }
 
     switch( cutoverlay ){
@@ -211,6 +228,9 @@ void ofApp::draw(){
             }
         break;
     }
+    
+    
+    // --------- draw frames --------------
     
     ofEnableBlendMode(OF_BLENDMODE_ALPHA);
     

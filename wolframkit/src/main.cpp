@@ -84,11 +84,11 @@ int main( int argc, char *argv[] ){
         }   
         
         if( app->synthPath=="" ){
-            std::cout<< "[ folderkit ] no synths path given! \n";
+            std::cout<< "[ wolframkit ] no synths path given! \n";
             return 0;
         }
         if( app->seqPath=="" ){
-            std::cout<< "[ folderkit ] no sequences path given! \n";
+            std::cout<< "[ wolframkit ] no sequences path given! \n";
             return 0;
         }
         
@@ -101,6 +101,6 @@ int main( int argc, char *argv[] ){
 
         ofRunApp( app );
     }else{
-        std::cout<< "[ folderkit ] no folder path given! \n";
+        std::cout<< "[ wolframkit ] no folder path given! \n";
     }	
 }
