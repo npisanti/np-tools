@@ -46,6 +46,10 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
         
+        void reallocate();
+        void erase( int mx, int my );
+        void loadFrames();
+        
         ofVideoGrabber cam;
         
         ofFbo fbo;
@@ -79,10 +83,14 @@ class ofApp : public ofBaseApp{
         
         ofFbo precut;
         ofFbo cutfbo;
+
+        ofParameter<int> eSide;
+        ofParameter<bool> bCleaning;
         
         std::vector<ofImage> frames;
         
         float cursor;
+        int select;
         
         int cutoverlay;
 };

@@ -29,11 +29,12 @@
 	<cut_height>200</cut_height>
 	<offset_x>0</offset_x>
 	<offset_y>0</offset_y>
-	<speed>0.3</speed>
+	<speed>0.15</speed>
 	<preview_mode>2</preview_mode>
 	<crosshair_mode>0</crosshair_mode>
 	<border_frag>
 		<active>1</active>
 		<u_border>0.1</u_border>
 	</border_frag>
+	<eraser_side>20</eraser_side>
 </GUI>

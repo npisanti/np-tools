@@ -27,16 +27,14 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    ofSetWindowTitle( "(-)");
+    
+    bCleaning = false;
+    select = 0;
  
     frames.reserve(99);
-    ofDirectory dir;
-	dir.allowExt("png");
-	dir.listDir( ofToDataPath("frames") );
-	dir.sort(); 
-    frames.resize( dir.size() );
-	for( size_t i = 0; i < dir.size(); i++){
-        frames[i].load( dir.getPath(i ));
-    }
+
+    loadFrames();
     
     cam.setDeviceID(0);
     cam.setDesiredFrameRate(60);
@@ -52,13 +50,14 @@ void ofApp::setup(){
     borderfrag.name( "border" );
     borderfrag.uniform( iBorder.set("u_border", 0.05f, 0.0f, 0.4f) );
     borderfrag.load( ofToDataPath("border.frag") );
-    
+
     gui.setup( "GUI", "settings.xml", ofGetWidth()-220, 20 );
     gui.add( mirror.parameters );
     gui.add( mono.parameters );
     gui.add( hsb.parameters );
     gui.add( invertfrag.parameters  );
     gui.add( borderfrag.parameters  );
+    gui.add( eSide.set("eraser side", 20, 0,50 )  );
     gui.add( cutx.set("cut x", 700, 0, CAMW ));
     gui.add( cuty.set("cut y", 160, 0, CAMH ));
     gui.add( cutw.set("cut width", 200, 0, 640 ) );
@@ -70,18 +69,8 @@ void ofApp::setup(){
     gui.add( cMode.set("crosshair mode", 0, 0, 1 ) );
     gui.loadFromFile( "settings.xml" );
     
-    precut.allocate( cutw + CUTMARGIN*2, cuth + CUTMARGIN*2 );
-    precut.begin();
-        ofClear( 0, 0, 0, 0 );
-    precut.end();
-    
-    cutfbo.allocate( cutw, cuth );
-    cutfbo.begin();
-        ofClear( 0, 0, 0, 0 );
-    cutfbo.end();
-    
-    borderfrag.allocate( cutfbo );
-    
+    reallocate();
+
     ofBackground( 0 );
     
     cursor = 0.0f;
@@ -114,73 +103,87 @@ void ofApp::update(){
 void ofApp::draw(){
 
     ofSetColor( 255 );
-    fbo.draw( 0, 0 );
+   ofColor alt = ofColor( 255, 0, 0 );
 
-    switch( pMode ){
-        case 0: break;
-        case 1: case 2:
-            if( invertfrag.active ){
-                ofEnableBlendMode(OF_BLENDMODE_ADD);
-                ofSetColor( 255, 0, 0 );
-            }else{
-                ofEnableBlendMode(OF_BLENDMODE_MULTIPLY);
-                ofSetColor( 180 );
-            }
-            
-        break;
-    }
+    if( !bCleaning ){ // -------- draws acquisition UI -----
+        fbo.draw( 0, 0 );
 
-    switch( pMode ){
-        case 0: break;
-        
-        case 1:
-            if( ! frames.empty() ){
-                frames.back().draw( cutx, cuty );
-            }                    
-        break;
-        
-        case 2:
-            if( ! frames.empty() ){
-                frames.front().draw( cutx, cuty );
-            }
-        break;
-    }
-
-    ofEnableBlendMode(OF_BLENDMODE_ALPHA);
-
-    ofColor alt = ofColor( 255, 0, 0 );
-
-    ofNoFill();    
-    
-    switch( cMode ){
-        case 0:
-            ofSetColor( alt );
-            ofDrawLine( cutx, cuty+(cuth/2), cutx+cutw, cuty+(cuth/2) );
-            ofDrawLine( cutx+(cutw/2), cuty, cutx+(cutw/2), cuty+cuth );
-            ofDrawRectangle( cutx, cuty, cutw, cuth );        
-        break;
-        
-        case 1:
-        {
-            ofPushMatrix();
-            ofNoFill();
-            int cx = cutx + cutw/2;
-            int cy = cuty + cuth/2;
-            int rad = cutw * 0.3;
-            static const float step = TWO_PI / 3.0f;
-            ofSetColor( alt );
-                ofTranslate( cx, cy );
-                for( int i=0; i<3; ++i ){
-                    int x = cos( float(i) * step + PI*0.5) * rad;
-                    int y = sin( float(i) * step + PI*0.5) * rad;
-                    ofDrawCircle( x, y, 4 );
+        switch( pMode ){
+            case 0: break;
+            case 1: case 2:
+                if( invertfrag.active ){
+                    ofEnableBlendMode(OF_BLENDMODE_ADD);
+                    ofSetColor( 255, 0, 0 );
+                }else{
+                    ofEnableBlendMode(OF_BLENDMODE_MULTIPLY);
+                    ofSetColor( 180 );
                 }
-            ofPopMatrix();
-            ofDrawRectangle( cutx, cuty, cutw, cuth );   
+                
+            break;
         }
-        break;
+
+        switch( pMode ){
+            case 0: break;
+            
+            case 1:
+                if( ! frames.empty() ){
+                    frames.back().draw( cutx, cuty );
+                }                    
+            break;
+            
+            case 2:
+                if( ! frames.empty() ){
+                    frames.front().draw( cutx, cuty );
+                }
+            break;
+        }
+
+        ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+ 
+        ofNoFill();    
+        
+        switch( cMode ){
+            case 0:
+                ofSetColor( alt );
+                ofDrawLine( cutx, cuty+(cuth/2), cutx+cutw, cuty+(cuth/2) );
+                ofDrawLine( cutx+(cutw/2), cuty, cutx+(cutw/2), cuty+cuth );
+                ofDrawRectangle( cutx, cuty, cutw, cuth );        
+            break;
+            
+            case 1:
+            {
+                ofPushMatrix();
+                ofNoFill();
+                int cx = cutx + cutw/2;
+                int cy = cuty + cuth/2;
+                int rad = cutw * 0.3;
+                static const float step = TWO_PI / 3.0f;
+                ofSetColor( alt );
+                    ofTranslate( cx, cy );
+                    for( int i=0; i<3; ++i ){
+                        int x = cos( float(i) * step + PI*0.5) * rad;
+                        int y = sin( float(i) * step + PI*0.5) * rad;
+                        ofDrawCircle( x, y, 4 );
+                    }
+                ofPopMatrix();
+                ofDrawRectangle( cutx, cuty, cutw, cuth );   
+            }
+            break;
+        }
+                
+    }else{ // -------- draws cleaning UI -------
+        
+        if( ! frames.empty() ){
+            ofSetColor(255);
+            frames[select].draw( 0, 0, cutw*2, cuth*2 );
+        }   
+        ofSetColor( alt );
+        ofNoFill();
+        ofDrawRectangle( ofGetMouseX(), ofGetMouseY(), eSide*2, eSide*2);
+        
     }
     
+
     gui.draw();
     
     // ------------ draws cut preview -----
@@ -268,6 +271,53 @@ void ofApp::offcut(){
     ofEnableAlphaBlending();
 }
 
+void ofApp::loadFrames(){
+    ofDirectory dir;
+    dir.allowExt("png");
+    dir.listDir( ofToDataPath("frames") );
+    dir.sort(); 
+    frames.resize( dir.size() );
+    for( size_t i = 0; i < dir.size(); i++){
+        frames[i].load( dir.getPath(i ));
+    }
+}
+
+void ofApp::reallocate(){
+    precut.allocate( cutw + CUTMARGIN*2, cuth + CUTMARGIN*2 );
+    precut.begin();
+        ofClear( 0, 0, 0, 0 );
+    precut.end();
+    
+    cutfbo.allocate( cutw, cuth );
+    cutfbo.begin();
+        ofClear( 0, 0, 0, 0 );
+    cutfbo.end();
+    
+    borderfrag.allocate( cutfbo );
+}
+
+void ofApp::erase( int mx, int my ){
+    if( mx<cutw*2 && my < cuth*2 ){
+        mx = mx/2;
+        my = my/2;
+
+        ofPixels & pixels = frames[select].getPixels();
+        
+        int stopx = mx + eSide;
+        int stopy = my + eSide;
+        
+        if( stopx >= cutw ) stopx = cutw;
+        if( stopy >= cuth ) stopy = cuth;
+        
+        for( int x = mx; x<stopx; ++x ){
+            for( int y = my; y<stopy; ++y ){
+                pixels.setColor( x, y, ofColor(255, 255, 255, 0) );
+            }
+        }
+        frames[select].update();
+    }
+}
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 
@@ -302,6 +352,14 @@ void ofApp::keyPressed(int key){
             }
         break;
         
+        case 'l':
+            loadFrames();
+        break;
+        
+        case 'x':
+            erase( ofGetMouseX(), ofGetMouseY() );
+        break;
+        
         case 'z':
             if( !frames.empty() ) frames.pop_back();
         break;
@@ -312,20 +370,35 @@ void ofApp::keyPressed(int key){
         break;
         
         case 'r':
-            cutfbo.allocate( cutw, cuth );
-            cutfbo.begin();
-                ofClear( 0, 0, 0, 0 );
-            cutfbo.end();
+            reallocate();
+        break;
+        
+        case OF_KEY_TAB:
+            bCleaning = !bCleaning;
         break;
         
         case OF_KEY_RIGHT:
-            offsetX++;
-            offcut();
+            if( bCleaning ){
+                select++;
+                if( select >= (int)frames.size() ){
+                    select=0;
+                } 
+            }else{
+                offsetX++;
+                offcut();                
+            }
         break;
 
         case OF_KEY_LEFT:
-            offsetX--;
-            offcut();
+            if( bCleaning ){
+                select--;
+                if( select < 0 ){
+                    select=frames.size()-1;
+                } 
+            }else{
+                offsetX--;
+                offcut();                
+            }
         break;
         
         case OF_KEY_UP: 
@@ -356,18 +429,18 @@ void ofApp::keyReleased(int key){
 }
 
 //--------------------------------------------------------------
+void ofApp::mousePressed(int x, int y, int button){
+    erase( x, y );
+}
+
+//--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y){
 
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
-
+    erase( x, y );
 }
 
 //--------------------------------------------------------------
