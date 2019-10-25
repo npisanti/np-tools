@@ -1,0 +1,53 @@
+{
+    "rpiezos": {
+        "sensor_0": {
+            "active": "1",
+            "envelope_high": "1023",
+            "envelope_low": "0",
+            "trigger_high": "100",
+            "trigger_low": "10"
+        },
+        "sensor_1": {
+            "active": "1",
+            "envelope_high": "1023",
+            "envelope_low": "0",
+            "trigger_high": "100",
+            "trigger_low": "10"
+        },
+        "sensor_2": {
+            "active": "1",
+            "envelope_high": "1023",
+            "envelope_low": "0",
+            "trigger_high": "100",
+            "trigger_low": "10"
+        },
+        "sensor_3": {
+            "active": "1",
+            "envelope_high": "1023",
+            "envelope_low": "0",
+            "trigger_high": "100",
+            "trigger_low": "10"
+        },
+        "sensor_4": {
+            "active": "1",
+            "envelope_high": "1023",
+            "envelope_low": "0",
+            "trigger_high": "100",
+            "trigger_low": "10"
+        },
+        "sensor_5": {
+            "active": "1",
+            "envelope_high": "1023",
+            "envelope_low": "0",
+            "trigger_high": "100",
+            "trigger_low": "10"
+        },
+        "settings": {
+            "autoreload": "1",
+            "destination_ip": "localhost",
+            "destination_port": "12345",
+            "osc_prefix": "/piezos",
+            "sleep_nanosecs": "100"
+        }
+    }
+}

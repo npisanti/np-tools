@@ -30,6 +30,7 @@ namespace osc{
     const ofxOscMessage * message;
     ofxOscMessage toSend;
     int selected;
+    std::string _address;
     
     void setMessage( const ofxOscMessage & msg ){
         message = &msg;
@@ -64,7 +65,8 @@ namespace osc{
     }
 
     const char * address(){ 
-        return message->getAddress().c_str(); 
+        _address = message->getAddress();
+        return _address.c_str(); 
     }
     
     double number( int i ){
