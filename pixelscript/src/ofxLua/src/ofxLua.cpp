@@ -303,26 +303,26 @@ void ofxLua::scriptWindowResized(int w, int h) {
 }
 
 void ofxLua::scriptKeyPressed(int key) {
-	if(L == NULL || !isFunction("keyPressed")) {
+	if(L == NULL || !isFunction("key_pressed")) {
 		return;
 	}
-	lua_getglobal(L, "keyPressed");
+	lua_getglobal(L, "key_pressed");
 	lua_pushinteger(L, key);
 	if(lua_pcall(L, 1, 0, 0) != 0) {
-		std::string msg = "Error running keyPressed(): "
+		std::string msg = "Error running key_pressed(): "
 		                  + (std::string) lua_tostring(L, LUA_STACK_TOP);
 		errorOccurred(msg);
 	}
 }
 
 void ofxLua::scriptKeyReleased(int key) {
-	if(L == NULL || !isFunction("keyReleased")) {
+	if(L == NULL || !isFunction("key_released")) {
 		return;
 	}
-	lua_getglobal(L, "keyReleased");
+	lua_getglobal(L, "key_released");
 	lua_pushinteger(L, key);
 	if(lua_pcall(L, 1, 0, 0) != 0) {
-		std::string msg = "Error running keyReleased(): "
+		std::string msg = "Error running key_released(): "
 		                  + (std::string) lua_tostring(L, LUA_STACK_TOP);
 		errorOccurred(msg);
 	}

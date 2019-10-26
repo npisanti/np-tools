@@ -39,6 +39,10 @@
 
 class ofApp : public ofBaseApp{
 public:
+struct KeyEvent {
+    int key;
+    bool pressed;
+};
     
 // ---------- variables ----------------------------------------
 bool bShowFrameRate;
@@ -50,6 +54,8 @@ ofxOscReceiver receiver;
 int usecs;
 int mwidth;
 int mheight;
+std::vector<KeyEvent> keyEvents;
+
 
 //--------------------------------------------------------------
 void setup(){
@@ -70,12 +76,24 @@ void setup(){
     }
     
     script.load( path );    
+    
+    keyEvents.reserve(128);
 }
 
 //--------------------------------------------------------------
 void update(){
     
     script.update();
+    
+    // key event are executed after update so you can draw with them
+    for ( size_t i=0; i<keyEvents.size(); ++i ){
+        if( keyEvents[i].pressed){
+            script.lua.scriptKeyPressed( keyEvents[i].key );
+        }else{
+            script.lua.scriptKeyReleased( keyEvents[i].key );            
+        }
+    }
+    keyEvents.clear();
 }
 
 //--------------------------------------------------------------
@@ -125,12 +143,17 @@ void keyPressed(int key){
     switch( key ){    
         case 'f': bShowFrameRate = !bShowFrameRate; break;
     }
-    script.lua.scriptKeyPressed( key );
+    
+    keyEvents.emplace_back();
+    keyEvents.back().key = key;
+    keyEvents.back().pressed = true;
 }
 
 //--------------------------------------------------------------
 void keyReleased(int key){
-    script.lua.scriptKeyReleased( key );
+    keyEvents.emplace_back();
+    keyEvents.back().key = key;
+    keyEvents.back().pressed = false;
 }
 
 //--------------------------------------------------------------
