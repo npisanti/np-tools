@@ -43,10 +43,13 @@ public:
 // ---------- variables ----------------------------------------
 bool bShowFrameRate;
 bool bRotate;
+bool bMirror;
 np::PixelScript script;
 std::string path;
 ofxOscReceiver receiver;
 int usecs;
+int mwidth;
+int mheight;
 
 //--------------------------------------------------------------
 void setup(){
@@ -107,6 +110,16 @@ void draw(){
     }
 }
 
+//--------------------------------------------------------------
+void drawSecondWindow(ofEventArgs& args){
+    
+    int x = (mwidth - script.getWidth())/2;
+    int y = (mheight - script.getHeight())/2;
+    if( x<0 ) x=0;
+    if( y<0) y=0;        
+
+    script.draw( x, y );
+}
 //--------------------------------------------------------------
 void keyPressed(int key){
     switch( key ){    
@@ -180,12 +193,13 @@ int main( int argc, char *argv[] ){
                 }
             }
             
-            shared_ptr<ofApp> mainApp(new ofApp);
-            mainApp->path = path;
+            shared_ptr<ofApp> app(new ofApp);
             int width = 480;
             int height = 480;
-            mainApp->bRotate = false;
-            mainApp->usecs = -1;
+            app->path = path;
+            app->bRotate = false;
+            app->usecs = -1;
+            app->bMirror = false;
             bool decorated = true;
             
             for( int i=1; i<argc; ++i ){
@@ -195,33 +209,50 @@ int main( int argc, char *argv[] ){
                     decorated = false;   
                 }
 
-                if( cmd == "--width" || cmd == "-w" ){
+                if( cmd == "--size" || cmd == "-s" ){
                     if( i+1 < argc ){
-                        width = std::stoi( argv[i+1] );
+                        // split by 'x'
+                        auto splits = ofSplitString( std::string(argv[i+1]), "x");
+                        if( splits.size()>1 ){
+                            width = std::stoi( splits[0] );
+                            height = std::stoi( splits[1] );
+                        }else{
+                            std::cout<<"[ pixelscript ] wrong argument for --size or -s, it should be a resolution delimited by x, for example 1280x720\n";
+                            return 0;
+                        }
                     }
                 }
-                
-                if( cmd == "--height" || cmd == "-h" ){
+            
+                if( cmd == "--mirror" || cmd == "-m" ){
                     if( i+1 < argc ){
-                        height = std::stoi( argv[i+1] );
+                        // split by 'x'
+                        auto splits = ofSplitString( std::string(argv[i+1]), "x");
+                        if( splits.size()>1 ){
+                            app->mwidth = std::stoi( splits[0] );
+                            app->mheight = std::stoi( splits[1] );
+                            app->bMirror = true;
+                        }else{
+                            std::cout<<"[ pixelscript ] wrong argument for --mirror or -m, it should be a resolution delimited by x, for example 1280x720\n";
+                            return 0;
+                        }
                     }
                 }
             
                 if( cmd == "--rotate" || cmd == "-r" ){
-                    mainApp->bRotate = true;
+                    app->bRotate = true;
                 }
                 
                 if( cmd == "--headless" || cmd == "-x" ){
                     if( i+1 < argc ){
-                        mainApp->usecs = std::stoi( argv[i+1] );
+                        app->usecs = std::stoi( argv[i+1] );
                     }
                 }
             }
                             
-            if( mainApp->usecs > 0 ){
+            if( app->usecs > 0 ){
                 ofAppNoWindow window; 
                 ofSetupOpenGL( &window, 240, 240, OF_WINDOW);	
-                ofRunApp( mainApp );
+                ofRunApp( app );
             }else{
                 #ifdef __ARM_ARCH
                 ofGLESWindowSettings settings;
@@ -234,8 +265,19 @@ int main( int argc, char *argv[] ){
                     
                 settings.setSize( width, height );     
                 shared_ptr<ofAppBaseWindow> mainWindow = ofCreateWindow(settings);
-                        
-                ofRunApp(mainWindow, mainApp);
+                         
+                if( app->bMirror ){
+                    settings.setSize( app->mwidth, app->mheight );
+                    settings.setPosition(ofVec2f(ofGetScreenWidth(), 0));
+                    settings.resizable = false;
+                    settings.decorated = false;
+                    settings.shareContextWith = mainWindow;
+                    shared_ptr<ofAppBaseWindow> secondWindow = ofCreateWindow(settings);
+                    secondWindow->setVerticalSync(false);
+                    ofAddListener(secondWindow->events().draw, app.get(), &ofApp::drawSecondWindow);
+                }
+                    
+                ofRunApp(mainWindow, app);
                 ofRunMainLoop();
             }
 

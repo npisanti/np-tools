@@ -90,16 +90,18 @@ void np::PixelScript::update(){
         float now = ofGetElapsedTimef();
         clock += (now-before) * (speed*speed*speed);
         before = now;
-
         lfo::setPlayHead( clock );
 
         font::resources( font );
         png::resources( images );
         frag::resources( buffer, shaders, clock );
         px::resources( buffer );
-
-        lua.scriptUpdate();
-        lua.scriptDraw();        
+    }
+    
+    lua.scriptUpdate();
+    
+    if( !bHeadless ){
+        lua.scriptDraw();   
     }
     
     while(receiver.hasWaitingMessages()) {
