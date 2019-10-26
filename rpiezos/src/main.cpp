@@ -45,5 +45,7 @@ int main( int argc, char *argv[] ){
             ofSetupOpenGL(&window, 256,256,OF_WINDOW);  
             ofRunApp( app );            
         }        
+    }else{
+        std::cout<<"[rpiezos] no input file given! you should supply a .json config path\n";
     }
 }
