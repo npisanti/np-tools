@@ -58,7 +58,7 @@ void ofApp::setup(){
     limiter.thresholdControl.getOFParameterInt() = -9;
     limiter.makeup.getOFParameterInt() = 9;
     limiter.clipThreshold.getOFParameterInt() = -2;
-    reverb.gain.getOFParameterInt() = -18;
+    reverb.gain.getOFParameterInt() = -24;
     
     // JSON settings --------
     if( path!="" ){
