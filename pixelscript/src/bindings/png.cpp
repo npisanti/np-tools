@@ -64,11 +64,16 @@ namespace png{
         images->back().path = path;
 
         if( ofFilePath::getFileExt( ofFilePath::getFileName( std::string( path ) )) == "png" ){
-            images->back().folder[0].load( path );
+            std::string ap (path);
+            if( ! ofFilePath::isAbsolute(ap)  ){
+                ap = ofFilePath::getCurrentWorkingDirectory() + "/"+ ap;
+            }
+            images->back().folder[0].load( ap );
         }else{
             // directory 
             ofDirectory dir;
-            dir.listDir( path );
+            dir.openFromCWD( path );
+            dir.listDir();
             dir.allowExt("png");
             dir.sort();
             
@@ -77,7 +82,11 @@ namespace png{
             }
 
             for(int i = 0; i < (int)dir.size(); i++){
-                images->back().folder[i].load(dir.getPath(i));
+                std::string ap = dir.getPath(i);
+                if( ! ofFilePath::isAbsolute(ap)  ){
+                    ap = ofFilePath::getCurrentWorkingDirectory() + "/"+ ap;
+                }
+                images->back().folder[i].load(ap);
             }
         }
         current = &images->back();
