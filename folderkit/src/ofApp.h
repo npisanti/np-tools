@@ -21,7 +21,7 @@
 
 #pragma once
 
-#define NUMSAMPLERS 8
+#define NUMSAMPLERS 16
 
 #include "ofMain.h"
 #include "ofxMidi.h"
@@ -31,13 +31,13 @@
 #include "effect/BasiVerb.h"
 #include "effect/StereoDelay.h"
 #include "meter/RMS.h"
-#include "dynamics/Comp.h"
+#include "dynamics/Brickwall.h"
 
+#include "ModalTable.h"
 #include "Library.h"
 #include "Sampler.h"
-#include "Percussion.h"
 #include "LiveParameters.h"
-#include "Karplus.h"
+
 
 class ofApp : public ofBaseApp{
 
@@ -65,25 +65,31 @@ class ofApp : public ofBaseApp{
         ofxOscSender        sender;
           
         np::effect::BasiVerb  reverb;
-        np::effect::StereoDelay delays;
-        
+        //np::effect::StereoDelay delays;
+        //pdsp::LowCut delaycut;
+                
         ofParameterGroup parameters;
         np::LiveParameters live;
 
-        motore::Sampler samplers [ NUMSAMPLERS ];
-        std::vector<np::synth::Percussion> percs;
-        np::folderkit::Karplus karplus;
+        folderkit::Sampler samplers [ NUMSAMPLERS ];
+ 
+        np::tuning::ModalTable table;
+ 
+        //pdsp::ParameterAmp enableReverb;
+        //pdsp::ParameterAmp enableDelays;
+        //pdsp::ParameterGain reverbSend;
         
-        pdsp::ParameterAmp enableReverb;
-        pdsp::ParameterAmp enableDelays;
+             
+        pdsp::Parameter driveControl;
+        pdsp::Parameter clipControl;
+        pdsp::Parameter gainControl;
+   
+        np::dynamics::Brickwall limiter;
         
-        np::dynamics::Compressor percbus;
-        
-        pdsp::LowCut delaycut;
-        
+
         bool bDrawGui;
         
-        motore::Library library;
+        folderkit::Library library;
         
         std::string path;
         int inputPort;

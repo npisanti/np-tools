@@ -26,8 +26,11 @@
 #include "Library.h"
 #include "dynamics/SoftClip.h"
 #include "meter/RMS.h"
+#include "ModalTable.h"
 
-namespace motore {
+//#define SAMPLER_USE_LOWCUT
+
+namespace folderkit {
     
 class Sampler : public pdsp::Patchable {
     
@@ -42,9 +45,9 @@ public:
     pdsp::Patchable & in_select();
     pdsp::Patchable & in_pitch();
     
-    void linkToLibrary( motore::Library & library );
+    void linkToLibrary( folderkit::Library & library );
         
-    void oscMapping( pdsp::osc::Input & osc, std::string address );
+    void oscMapping( pdsp::osc::Input & osc, std::string address, np::tuning::ModalTable * table );
     
     pdsp::Patchable & ch( int i );  
     
@@ -59,33 +62,39 @@ private:
     pdsp::PatchNode     triggers;
     pdsp::Sampler       sampler;
     pdsp::AHR           env;
-    pdsp::AHR           fEnv;
     pdsp::Amp           amp;
 
-    pdsp::TriggeredRandom   drift;
-    pdsp::Amp               driftAmt;
-    pdsp::Parameter         driftControl;
+    pdsp::TriggeredRandom   samplerDrift;
+
+    pdsp::CombFilter comb;     
+    pdsp::LFOPhazor         phazorFree;
+    pdsp::TriggeredRandom   rnd;
+    pdsp::OnePole           randomSlew;
     
-    pdsp::PatchNode         pitchNode;
+    /*
     pdsp::Parameter         pitchControl;
-        
-    pdsp::Parameter        attackControl;
-    pdsp::Parameter        holdControl;
-    pdsp::Parameter        releaseControl;
-    pdsp::Parameter        lowCutControl;
-    pdsp::Parameter        panControl;
-    
     pdsp::ParameterGain    sendDelay;
     pdsp::ParameterGain    sendRev;
-    
+    */
     pdsp::Panner           pan;
-    
+
+#ifdef SAMPLER_USE_LOWCUT
+    pdsp::Parameter        lowCutControl;    
     pdsp::LowCut lowcut;
-    
-    np::dynamics::SoftClip softclip;
+#endif
+
+
+    // -----------------------------
+    pdsp::DBtoLin inputControl;
+    pdsp::Amp inputGainStage;
+    pdsp::SoftClip clip;
+    pdsp::IIRUpSampler2x upsampler;
+    pdsp::IIRDownSampler2x downsampler; 
+    pdsp::Amp outputGainStage; 
+    pdsp::DBtoLin outputControl;    
     
     // -----------------------------
-    motore::Library * pLibrary;
+    folderkit::Library * pLibrary;
     
     int cursor;    
     int tPast;

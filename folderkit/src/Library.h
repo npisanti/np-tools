@@ -25,7 +25,7 @@
 #include "ofxPDSP.h"
 #include <atomic>
 
-namespace motore {
+namespace folderkit {
     
 class Correlation{
 public:

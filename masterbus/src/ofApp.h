@@ -29,7 +29,6 @@
 #include "dynamics/Brickwall.h"
 #include "LiveParameters.h"
 
-
 class ofApp : public ofBaseApp{
 
 	public:
