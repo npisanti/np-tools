@@ -39,7 +39,7 @@ private:
         float pitch;
     };
 
-public: // ------------------- PUBLIC API --------------------------------------
+public: // ------------------- PUBLIC API ----------------------------
 
     ModalTable(){}
     ModalTable( const ModalTable & other ) { }
@@ -54,7 +54,7 @@ public: // ------------------- PUBLIC API --------------------------------------
     std::atomic<int> deg;
     std::atomic<int> base;
     
-private: // --------------------------------------------------------------------
+private: // ----------------------------------------------------------
 
     void updateAll( int & value );
     

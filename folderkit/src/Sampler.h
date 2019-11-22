@@ -27,6 +27,7 @@
 #include "dynamics/SoftClip.h"
 #include "meter/RMS.h"
 #include "ModalTable.h"
+#include "FlipSwitch.h"
 
 //#define SAMPLER_USE_LOWCUT
 
@@ -55,12 +56,20 @@ public:
     
     int checkTrigger();
     
+    
+    pdsp::ADSR          fadeEnvs[2];
+    
 private:
     void patch ();
     
     pdsp::PatchNode     selectNode;
+    pdsp::PatchNode     startNode;
     pdsp::PatchNode     triggers;
-    pdsp::Sampler       sampler;
+    
+    pdsp::Sampler       samplers[2];
+    pdsp::Amp           fadeAmps[2];
+    np::FlipSwitch      flips[2];
+    
     pdsp::AHR           env;
     pdsp::Amp           amp;
 
@@ -71,18 +80,12 @@ private:
     pdsp::TriggeredRandom   rnd;
     pdsp::OnePole           randomSlew;
     
-    /*
-    pdsp::Parameter         pitchControl;
-    pdsp::ParameterGain    sendDelay;
-    pdsp::ParameterGain    sendRev;
-    */
     pdsp::Panner           pan;
 
 #ifdef SAMPLER_USE_LOWCUT
     pdsp::Parameter        lowCutControl;    
     pdsp::LowCut lowcut;
 #endif
-
 
     // -----------------------------
     pdsp::DBtoLin inputControl;
@@ -100,7 +103,6 @@ private:
     int tPast;
 
     std::atomic<int> instrument;
-
 
 };   
     

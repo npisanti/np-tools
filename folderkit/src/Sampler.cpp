@@ -38,18 +38,31 @@ void folderkit::Sampler::patch (){
     env.set( 0.0f, 0.0f, 0.0f );
     0.0f >> env.in_velocity();
     0.5f >> comb.in_damping();
-    
-    samplerDrift * sample_drift_amount >> sampler.in_pitch();
-    
+
     triggers >> samplerDrift.in_trig();
-    triggers >> sampler  >> amp;
     triggers >> env      >> amp.in_mod();
+    
+    flips[0].init( true );
+    for( int i=0; i<2; ++i ){
+        triggers >> flips[i] >> fadeEnvs[i].in_trig();
+        float fadeout = 15.0f;
+        0.0f >>fadeEnvs[i].in_attack();
+        1.0f >>fadeEnvs[i].in_sustain();
+        fadeout >> fadeEnvs[i].in_decay();
+        fadeout >> fadeEnvs[i].in_release();
+        fadeEnvs[i] >> fadeAmps[i].in_mod();
+        samplers[i] >> fadeAmps[i] >> amp;
+        flips[i] >> samplers[i];
+        
+        samplerDrift * sample_drift_amount >> samplers[i].in_pitch();
+        selectNode >> samplers[i].in_select();
+        startNode >> samplers[i].in_start();
+    }
 
     0.2f    >> phazorFree;
     0.05f  >> randomSlew.in_freq();   
     phazorFree.out_trig() >> rnd >> randomSlew * comb_drift_amount >> comb.in_pitch(); 
-
-    sampler >> amp >> comb;
+    amp >> comb;
                            
 #ifdef SAMPLER_USE_LOWCUT
     comb >> lowcut >> inputGainStage;
@@ -65,18 +78,16 @@ void folderkit::Sampler::patch (){
     inputControl >> inputGainStage.in_mod();
     outputControl >> outputGainStage.in_mod();
 
-    selectNode >> sampler.in_select();
-    
+
     rms.attackControl.getOFParameterInt() = 0;
     rms.releaseControl.getOFParameterInt() = 800;
 
     parameters.setName( "rename me");
-/*
-    parameters.add( pitchControl.set("pitch", 0, -24, 24));
+
 #ifdef SAMPLER_USE_LOWCUT
     parameters.add( lowCutControl.set("low cut hz", 30, 20, 500) );
 #endif
-*/
+
     pLibrary = nullptr;
     tPast = 0;
     cursor = 0;
@@ -114,7 +125,8 @@ void folderkit::Sampler::linkToLibrary( folderkit::Library & library ){
     std::cout<<"[folderkit::Sampler] adding "<<library.samples.size()<<" samples\n";
     
     for( size_t i=0; i<library.samples.size(); ++i ){
-        sampler.addSample( library.samples[i], 0 );
+        samplers[0].addSample( library.samples[i], 0 );
+        samplers[1].addSample( library.samples[i], 0 );
     }
     
     pLibrary = &library;
@@ -122,7 +134,7 @@ void folderkit::Sampler::linkToLibrary( folderkit::Library & library ){
 
 void folderkit::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address, np::tuning::ModalTable * table ){
     
-    osc.out_trig( address, 0 ) >> sampler.in_select();
+    osc.out_trig( address, 0 ) >> selectNode;
     osc.out_trig( address, 0 ) >> triggers;
     osc.parser( address , 0) = [&]( float value ) noexcept {
         //std::cout<<"received message\n";
@@ -135,7 +147,8 @@ void folderkit::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
         }
     };
 
-    osc.out_value( address, 1 ) >> sampler.in_pitch();
+    osc.out_value( address, 1 ) >> samplers[0].in_pitch();
+    osc.out_value( address, 1 ) >> samplers[1].in_pitch();
     osc.parser( address, 1 ) = [&, table]( float value ) noexcept {
         int i = value;
         float p = table->pitches[i%table->degrees];
@@ -148,7 +161,7 @@ void folderkit::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
         return p;  
     };       
 
-    osc.out_value( address, 2 ) * (1.0f/32.0f) >> sampler.in_start();
+    osc.out_value( address, 2 ) * (1.0f/32.0f) >> startNode;
     
     osc.out_value( address, 3 ) >> pan.in_pan();
     osc.out_value( address, 3 ).enableSmoothing(20.0f);
