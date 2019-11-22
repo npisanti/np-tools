@@ -64,12 +64,9 @@ void folderkit::Sampler::patch (){
     phazorFree.out_trig() >> rnd >> randomSlew * comb_drift_amount >> comb.in_pitch(); 
     amp >> comb;
                            
-#ifdef SAMPLER_USE_LOWCUT
     comb >> lowcut >> inputGainStage;
     lowCutControl >> lowcut.in_freq();
-#else
-    comb >>inputGainStage;
-#endif
+
     outputGainStage >> pan;
     outputGainStage >> rms;
 
@@ -84,9 +81,7 @@ void folderkit::Sampler::patch (){
 
     parameters.setName( "rename me");
 
-#ifdef SAMPLER_USE_LOWCUT
     parameters.add( lowCutControl.set("low cut hz", 30, 20, 500) );
-#endif
 
     pLibrary = nullptr;
     tPast = 0;

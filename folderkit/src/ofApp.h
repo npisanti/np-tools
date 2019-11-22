@@ -36,6 +36,7 @@
 #include "ModalTable.h"
 #include "Library.h"
 #include "Sampler.h"
+#include "IRVerb.h"
 #include "LiveParameters.h"
 
 
@@ -72,14 +73,17 @@ class ofApp : public ofBaseApp{
         np::LiveParameters live;
 
         folderkit::Sampler samplers [ NUMSAMPLERS ];
+        folderkit::IRVerb ireverb;
  
         np::tuning::ModalTable table;
  
         //pdsp::ParameterAmp enableReverb;
         //pdsp::ParameterAmp enableDelays;
-        //pdsp::ParameterGain reverbSend;
+        pdsp::ParameterGain reverbSend;
         
-             
+        ofParameterGroup cuts;
+        
+        ofParameterGroup general;
         pdsp::Parameter driveControl;
         pdsp::Parameter clipControl;
         pdsp::Parameter gainControl;

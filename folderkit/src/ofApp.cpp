@@ -40,20 +40,36 @@ void ofApp::setup(){
     library.init( path ) ;
     table.setup( "pitch_table" );
     
+    bool bUseIR = ireverb.load( path + "/IR" );
+    
     // --------------------------------------------
     
     for( int i=0; i<NUMSAMPLERS; ++i ){
         std::cout<< "[ folderkit ] initializating sampler "<<i<<"\n";
         samplers[i].linkToLibrary( library );    
         //samplers[i].rms >> engine.blackhole();
-        samplers[i].out("signal") >> reverb;
+        
+        if( bUseIR ){
+            samplers[i].ch(0) >> reverbSend.ch(0);
+            samplers[i].ch(1) >> reverbSend.ch(1);
+        }else{
+            samplers[i].out("signal") >> reverbSend;
+        }
         samplers[i].ch(0) >> limiter.ch(0);
         samplers[i].ch(1) >> limiter.ch(1);
     }
     
+    if(bUseIR){
+        reverbSend.ch(0) >> ireverb.ch(0) * dB(-24.0f) >> limiter.ch(0);
+        reverbSend.ch(1) >> ireverb.ch(1) * dB(-24.0f)  >> limiter.ch(1);
+    }else{
+        reverbSend >> reverb;
+        reverb.ch(0) >> limiter.ch(0);
+        reverb.ch(1) >> limiter.ch(1);
+    }
     
-    reverb.ch(0) >> limiter.ch(0) >> engine.audio_out(0);
-    reverb.ch(1) >> limiter.ch(1) >> engine.audio_out(1);
+    limiter.ch(0) >> engine.audio_out(0);
+    limiter.ch(1) >> engine.audio_out(1);
  
     std::vector<std::string> addresses = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" };
 
@@ -72,10 +88,18 @@ void ofApp::setup(){
             driveControl >> samplers[i].in("clip_input");
             clipControl >> samplers[i].in("clip_threshold");
             gainControl >> samplers[i].in("clip_output");
+            
+            cuts.add( samplers[i].lowCutControl.set( std::string("samp_") + addresses[i], 30, 20, 500 ) );
         }
-        parameters.add( driveControl.set("samplers_drive", 12, -48, 24) );
-        parameters.add( clipControl.set("clippers_threshold", -2, -12, 1) );
-        parameters.add( gainControl.set("samplers_gain", -12, -48, 24) );        
+        cuts.setName( "low_cuts" );
+        parameters.add( cuts );
+        
+        general.setName("general_settings");
+        general.add( driveControl.set("samplers_drive", 12, -48, 24) );
+        general.add( clipControl.set("clippers_threshold", -2, -12, 1) );
+        general.add( gainControl.set("samplers_gain", -12, -48, 24) );
+        general.add( reverbSend.set("reverb_send", -18, -48, 24) );parameters.add( general );        
+        
         parameters.add( limiter.parameters );
         parameters.add( reverb.parameters );
         parameters.add( table.parameters );

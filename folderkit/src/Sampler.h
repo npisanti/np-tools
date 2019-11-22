@@ -29,8 +29,6 @@
 #include "ModalTable.h"
 #include "FlipSwitch.h"
 
-//#define SAMPLER_USE_LOWCUT
-
 namespace folderkit {
     
 class Sampler : public pdsp::Patchable {
@@ -55,7 +53,8 @@ public:
     np::meter::RMS rms;
     
     int checkTrigger();
-    
+
+    pdsp::Parameter        lowCutControl;    
     
     pdsp::ADSR          fadeEnvs[2];
     
@@ -82,10 +81,8 @@ private:
     
     pdsp::Panner           pan;
 
-#ifdef SAMPLER_USE_LOWCUT
-    pdsp::Parameter        lowCutControl;    
     pdsp::LowCut lowcut;
-#endif
+
 
     // -----------------------------
     pdsp::DBtoLin inputControl;
