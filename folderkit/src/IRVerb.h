@@ -10,7 +10,10 @@ public:
     bool load( std::string path );
 
     pdsp::Patchable & ch( int i );
-private:
+
+    pdsp::LowCut          cut0;
+    pdsp::LowCut          cut1;
+
     pdsp::FDLConvolver    rev0;
     pdsp::FDLConvolver    rev1;
     

@@ -12,6 +12,12 @@ bool folderkit::IRVerb::load( std::string path ){
         return false;
     }
     
+    100.0f >> cut0.in_freq();
+    100.0f >> cut1.in_freq();
+    
+    cut0 >> rev0;
+    cut1 >> rev1;
+    
     impulse0.load( dir.getPath(0) );
     
     if( impulse0.channels > 1 ){

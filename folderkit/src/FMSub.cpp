@@ -75,28 +75,28 @@ void np::synth::FMSub::patch(){
 
 void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, np::tuning::ModalTable * table ){
     
-    osc.out_trig( address, 0 ) >> voiceTrigger;
-    osc.out_trig( address, 0 ) >> ampEnv.in_hold();
-    osc.parser( address , 0) = [&]( float value ) noexcept {
-        if( value == 0.0f ) {
-            return pdsp::osc::Ignore;
-        }
-        return value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
-    };
-    
-    osc.out_value( address, 1 ) >> pitchNode;
-    osc.out_value( address, 1 ) >> pitchNode;
-    osc.parser( address, 1 ) = [&, table]( float value ) noexcept {
+    osc.out_value( address, 0 ) >> pitchNode;
+    osc.out_value( address, 0 ) >> pitchNode;
+    osc.parser( address, 0 ) = [&, table]( float value ) noexcept {
         int i = value;
         float p = table->pitches[i%table->degrees];
         int o = i / table->degrees;
         p += o*12.0f;
         return p;  
     };       
+
+    osc.out_trig( address, 1 ) >> voiceTrigger;
+    osc.out_trig( address, 1 ) >> ampEnv.in_hold();
+    osc.parser( address , 1) = [&]( float value ) noexcept {
+        if( value == 0.0f ) {
+            return pdsp::osc::Ignore;
+        }
+        return value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
+    };
     
     osc.out_value( address, 2 ).enableSmoothing(50.0f);
-    osc.out_value( address, 2 ) * (1.0f/40.0f) >> carrierA.in_fb();
-    osc.out_value( address, 2 ) * (1.0f/40.0f) >> carrierB.in_fb();
+    osc.out_value( address, 2 ) * (1.0f/64.0f) >> carrierA.in_fb();
+    osc.out_value( address, 2 ) * (1.0f/64.0f) >> carrierB.in_fb();
     
     osc.out_value( address, 3 ) * (1.0f/8.0f) >> fm_mod.in_mod();
     

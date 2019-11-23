@@ -60,15 +60,21 @@ void ofApp::setup(){
     }
     
     if(bUseIR){
-        reverbSend.ch(0) >> ireverb.ch(0) * dB(-24.0f) >> limiter.ch(0);
-        reverbSend.ch(1) >> ireverb.ch(1) * dB(-24.0f)  >> limiter.ch(1);
+        sub * dB(-21.0f) >> reverbSend.ch(0);
+        sub * dB(-21.0f) >> reverbSend.ch(1);
+        reverbSend.ch(0) >> ireverb.cut0;
+        reverbSend.ch(1) >> ireverb.cut1; 
+        ireverb.rev0 * dB(-24.0f) >> limiter.ch(0);
+        ireverb.rev1 * dB(-24.0f) >> limiter.ch(1);
     }else{
-        reverbSend >> reverb;
+        sub * dB(-21.0f) >> reverbSend >> reverb;
         reverb.ch(0) >> limiter.ch(0);
         reverb.ch(1) >> limiter.ch(1);
     }
+    
     sub >> limiter.ch(0);
     sub >> limiter.ch(1);
+
     table.tonalControl >> sub.in("modulator");
     
     limiter.ch(0) >> engine.audio_out(0);
