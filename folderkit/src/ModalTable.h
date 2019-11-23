@@ -54,6 +54,8 @@ public: // ------------------- PUBLIC API ----------------------------
     std::atomic<int> deg;
     std::atomic<int> base;
     
+    pdsp::ValueControl tonalControl;
+    
 private: // ----------------------------------------------------------
 
     void updateAll( int & value );

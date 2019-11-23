@@ -38,7 +38,7 @@
 #include "Sampler.h"
 #include "IRVerb.h"
 #include "LiveParameters.h"
-
+#include "FMSub.h"
 
 class ofApp : public ofBaseApp{
 
@@ -74,6 +74,7 @@ class ofApp : public ofBaseApp{
 
         folderkit::Sampler samplers [ NUMSAMPLERS ];
         folderkit::IRVerb ireverb;
+        np::synth::FMSub sub;
  
         np::tuning::ModalTable table;
  

@@ -67,6 +67,9 @@ void ofApp::setup(){
         reverb.ch(0) >> limiter.ch(0);
         reverb.ch(1) >> limiter.ch(1);
     }
+    sub >> limiter.ch(0);
+    sub >> limiter.ch(1);
+    table.tonalControl >> sub.in("modulator");
     
     limiter.ch(0) >> engine.audio_out(0);
     limiter.ch(1) >> engine.audio_out(1);
@@ -76,6 +79,7 @@ void ofApp::setup(){
     // OSC mapping -----------------------------
     osc.linkTempo( "/orca/bpm" );
 
+    sub.oscMapping( osc, "/s", &table );
     for(size_t i=0; i<NUMSAMPLERS; ++i ){
         std::string address = "/";
         address += addresses[i];
@@ -103,6 +107,7 @@ void ofApp::setup(){
         parameters.add( limiter.parameters );
         parameters.add( reverb.parameters );
         parameters.add( table.parameters );
+        parameters.add( sub.parameters );
         
     live.watch( parameters, path + "/settings.json");
 

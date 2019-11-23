@@ -24,7 +24,7 @@
 void folderkit::Sampler::patch (){
     
     float sample_drift_amount = 0.05f;
-    float comb_drift_amount = 0.07f;
+    float comb_drift_amount = 0.06f;
     
     addModuleInput("clip_input", inputControl );
     addModuleInput("clip_threshold", clip.in_threshold() );
@@ -159,16 +159,19 @@ void folderkit::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
     osc.out_value( address, 2 ) * (1.0f/32.0f) >> startNode;
     
     osc.out_value( address, 3 ) >> pan.in_pan();
-    osc.out_value( address, 3 ).enableSmoothing(20.0f);
     osc.parser(address, 3) = [&]( float value ) noexcept {
-        if( value > 8.0f ){
-            value = value - 9.0f;
-            value /= 8.0f;
-            value = (value<1.0) ? value : 1.0;
-            return value-1.0f;
-        }else{
-            value /= 8.0f;
-            return value;
+        int pan = value;
+        if( pan > 9 ) pan = 9;
+        switch( pan ){
+            default: case 0: case 5: return 0.0f; break;
+            case 1: return -1.0f; break;
+            case 2: return -0.75f; break;
+            case 3: return -0.5f; break;
+            case 4: return -0.25f; break;
+            case 6: return 0.25f; break;
+            case 7: return 0.5f; break;
+            case 8: return 0.75f; break;
+            case 9: return 1.0f; break;
         }
     };      
 
@@ -198,11 +201,12 @@ void folderkit::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
 
     osc.out_value( address, 6 ) >> comb.in_feedback();
     osc.parser(address, 6) = [&]( float value ) noexcept {
-        value *= (1.0f/16.0f);
+        value *= (1.0f/9.0f);
         value = (value<1.0f) ? value : 1.0f;
         value = 1.0f-value;
         value = value * value;
-        value = 1.0f-value;        
+        value = 1.0f-value;      
+        value *= 0.999f;  
         return value;  
     };      
     

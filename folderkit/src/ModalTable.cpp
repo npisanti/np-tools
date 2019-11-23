@@ -39,6 +39,8 @@ ofParameterGroup & np::tuning::ModalTable::setup( std::string name ) {
     deg = degrees;
     base = masterPitchControl;
     
+    tonalControl.set( masterPitchControl );
+    
     int dummy = 0;
     updateAll( dummy );
     
@@ -60,4 +62,6 @@ void np::tuning::ModalTable::updateAll( int & value ) {
     }
     base = masterPitchControl;
     deg = degrees;
+    
+    tonalControl.set( masterPitchControl );
 }
