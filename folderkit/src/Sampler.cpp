@@ -146,11 +146,11 @@ void folderkit::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
     osc.out_value( address, 1 ) >> samplers[1].in_pitch();
     osc.parser( address, 1 ) = [&, table]( float value ) noexcept {
         int i = value;
-        float p = table->pitches[i%table->degrees];
-        int o = i / table->degrees;
-        if( i > 24 ){
-            o-=3;
+        if( i >= 24 ){
+            i -= 36;
         }
+        float p = table->pitches[(i+12)%table->degrees];
+        int o = i / table->degrees;
         p += o*12.0f;
         p -= table->base;
         return p;  
