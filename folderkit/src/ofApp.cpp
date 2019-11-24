@@ -23,6 +23,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    ofSetFrameRate( 200 ); // faster OSC mirroring 
     
     ofSetWindowTitle("|::|");
     engine.score.setTempo( 120.0f); // the delay times are clocked
