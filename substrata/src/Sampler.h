@@ -1,6 +1,6 @@
 /*====================================================================
 
-	folderkit - companion drumkit for orca-c
+	substrata - companion drumkit for orca-c
   
 	Copyright (c) 2019 Nicola Pisanti <nicola@npisanti.com>
 
@@ -29,7 +29,7 @@
 #include "ModalTable.h"
 #include "FlipSwitch.h"
 
-namespace folderkit {
+namespace substrata {
     
 class Sampler : public pdsp::Patchable {
     
@@ -44,7 +44,7 @@ public:
     pdsp::Patchable & in_select();
     pdsp::Patchable & in_pitch();
     
-    void linkToLibrary( folderkit::Library & library );
+    void linkToLibrary( substrata::Library & library );
         
     void oscMapping( pdsp::osc::Input & osc, std::string address, np::tuning::ModalTable * table );
     
@@ -94,7 +94,7 @@ private:
     pdsp::DBtoLin outputControl;    
     
     // -----------------------------
-    folderkit::Library * pLibrary;
+    substrata::Library * pLibrary;
     
     int cursor;    
     int tPast;

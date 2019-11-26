@@ -1,6 +1,6 @@
 /*====================================================================
 
-	folderkit - companion drumkit for orca-c
+	substrata - companion drumkit for orca-c
   
 	Copyright (c) 2019 Nicola Pisanti <nicola@npisanti.com>
 
@@ -25,7 +25,7 @@
 #include "ofxPDSP.h"
 #include <atomic>
 
-namespace folderkit {
+namespace substrata {
     
 class Correlation{
 public:

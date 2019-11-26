@@ -1,6 +1,6 @@
 /*====================================================================
 
-	folderkit - companion drumkit for orca-c
+	substrata - companion drumkit for orca-c
   
 	Copyright (c) 2019 Nicola Pisanti <nicola@npisanti.com>
 
@@ -21,13 +21,13 @@
 
 #include "Library.h"
 
-folderkit::Correlation::Correlation(){
+substrata::Correlation::Correlation(){
     sampleMin = 0;
     sampleMax = 0;
     now = 0;
 }
 
-void folderkit::Library::correlate( int instrument, float & select ){
+void substrata::Library::correlate( int instrument, float & select ){
     if( instrument < 0 ) instrument = 0;
     if( instrument > 35 ) instrument = 35;  
     auto & corr = correlations[instrument];
@@ -44,7 +44,7 @@ void folderkit::Library::correlate( int instrument, float & select ){
     }
 }
     
-void folderkit::Library::init( std::string path ){
+void substrata::Library::init( std::string path ){
     
     std::cout<< "[Library] parsing "<<path<<"\n";
     std::cout<< "adding files";
@@ -78,7 +78,7 @@ void folderkit::Library::init( std::string path ){
 }
 
 
-void folderkit::Library::correlateFolder( std::string path, int index ){
+void substrata::Library::correlateFolder( std::string path, int index ){
 
     float amp = 1.0f;
     ofDirectory dbfile;
@@ -122,7 +122,7 @@ void folderkit::Library::correlateFolder( std::string path, int index ){
     availables[index] = 1;
 }
 
-void folderkit::Library::free(){
+void substrata::Library::free(){
     for( auto & pointer : samples ){
         if ( pointer != nullptr ){
             delete pointer;

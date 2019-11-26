@@ -1,6 +1,6 @@
 /*====================================================================
 
-	folderkit - companion drumkit for orca-c
+	substrata - companion drumkit for orca-c
   
 	Copyright (c) 2019 Nicola Pisanti <nicola@npisanti.com>
 
@@ -21,7 +21,7 @@
 
 #include "Sampler.h"
 
-void folderkit::Sampler::patch (){
+void substrata::Sampler::patch (){
     
     float sample_drift_amount = 0.05f;
     float comb_drift_amount = 0.06f;
@@ -89,24 +89,24 @@ void folderkit::Sampler::patch (){
     instrument = 0;
 }
 
-ofParameterGroup & folderkit::Sampler::label( std::string name ){
+ofParameterGroup & substrata::Sampler::label( std::string name ){
     parameters.setName( name );
     return parameters;
 }
 
-pdsp::Patchable & folderkit::Sampler::in_trig() {
+pdsp::Patchable & substrata::Sampler::in_trig() {
     return in("trig");
 }
 
-pdsp::Patchable & folderkit::Sampler::in_select() {
+pdsp::Patchable & substrata::Sampler::in_select() {
     return in("select");
 }
 
-pdsp::Patchable & folderkit::Sampler::in_pitch() {
+pdsp::Patchable & substrata::Sampler::in_pitch() {
     return in("pitch");
 }
 
-pdsp::Patchable & folderkit::Sampler::ch( int i ){
+pdsp::Patchable & substrata::Sampler::ch( int i ){
     switch( i ){
         case 0: return out("L"); break;
         case 1: return out("R"); break;
@@ -115,9 +115,9 @@ pdsp::Patchable & folderkit::Sampler::ch( int i ){
     return out("L");
 }
 
-void folderkit::Sampler::linkToLibrary( folderkit::Library & library ){
+void substrata::Sampler::linkToLibrary( substrata::Library & library ){
     
-    std::cout<<"[folderkit::Sampler] adding "<<library.samples.size()<<" samples\n";
+    std::cout<<"[substrata::Sampler] adding "<<library.samples.size()<<" samples\n";
     
     for( size_t i=0; i<library.samples.size(); ++i ){
         samplers[0].addSample( library.samples[i], 0 );
@@ -127,7 +127,7 @@ void folderkit::Sampler::linkToLibrary( folderkit::Library & library ){
     pLibrary = &library;
 }
 
-void folderkit::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address, np::tuning::ModalTable * table ){
+void substrata::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address, np::tuning::ModalTable * table ){
     
     osc.out_trig( address, 0 ) >> selectNode;
     osc.out_trig( address, 0 ) >> triggers;
@@ -221,7 +221,7 @@ void folderkit::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
 
 }
 
-int folderkit::Sampler::checkTrigger(){
+int substrata::Sampler::checkTrigger(){
     int trigs = env.meter_triggers();
     if( tPast != trigs ){
         tPast = trigs;

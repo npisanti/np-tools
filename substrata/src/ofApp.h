@@ -1,6 +1,6 @@
 /*====================================================================
 
-	folderkit - companion drumkit for orca-c
+	substrata - companion drumkit for orca-c
   
 	Copyright (c) 2019 Nicola Pisanti <nicola@npisanti.com>
 
@@ -74,8 +74,8 @@ class ofApp : public ofBaseApp{
         ofParameterGroup parameters;
         np::LiveParameters live;
 
-        folderkit::Sampler samplers [ NUMSAMPLERS ];
-        folderkit::IRVerb ireverb;
+        substrata::Sampler samplers [ NUMSAMPLERS ];
+        substrata::IRVerb ireverb;
         np::synth::FMSub sub;
         np2::synth::NoiseDevice noise;
         np2::synth::SinePercussion zap;
@@ -99,7 +99,7 @@ class ofApp : public ofBaseApp{
 
         bool bDrawGui;
         
-        folderkit::Library library;
+        substrata::Library library;
         
         std::string path;
         int inputPort;

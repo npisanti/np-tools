@@ -1,6 +1,6 @@
 /*====================================================================
 
-	folderkit - companion drumkit for orca-c
+	substrata - companion drumkit for orca-c
   
 	Copyright (c) 2019 Nicola Pisanti <nicola@npisanti.com>
 
@@ -79,13 +79,13 @@ int main( int argc, char *argv[] ){
             }
         }   
         if( app->path=="" ){
-            std::cout<< "[ folderkit ] no folder path given! \n";
+            std::cout<< "[ substrata ] no folder path given! \n";
             return 0;
         }
         
         ofRunApp( app );
     }else{
-        std::cout<< "[ folderkit ] no folder path given! \n";
+        std::cout<< "[ substrata ] no folder path given! \n";
     }
 
 	

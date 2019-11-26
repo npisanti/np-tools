@@ -1,6 +1,6 @@
 /*====================================================================
 
-	folderkit - companion drumkit for orca-c
+	substrata - companion drumkit for orca-c
   
 	Copyright (c) 2019 Nicola Pisanti <nicola@npisanti.com>
 
@@ -31,11 +31,11 @@ void ofApp::setup(){
     bDrawGui = true;
 
     osc.openPort( inputPort );
-    std::cout<<"[ folderkit ] receiving osc on port "<<inputPort<<"\n";
+    std::cout<<"[ substrata ] receiving osc on port "<<inputPort<<"\n";
     
     if( outputPort != -1 ){
         sender.setup( outputIP, outputPort);
-        std::cout<<"[ folderkit ] sending osc to port "<<outputPort<<" on "<<outputIP<<"\n";
+        std::cout<<"[ substrata ] sending osc to port "<<outputPort<<" on "<<outputIP<<"\n";
     }
     
     library.init( path ) ;
@@ -46,7 +46,7 @@ void ofApp::setup(){
     // --------------------------------------------
     
     for( int i=0; i<NUMSAMPLERS; ++i ){
-        std::cout<< "[ folderkit ] initializating sampler "<<i<<"\n";
+        std::cout<< "[ substrata ] initializating sampler "<<i<<"\n";
         samplers[i].linkToLibrary( library );    
         //samplers[i].rms >> engine.blackhole();
         
@@ -102,7 +102,7 @@ void ofApp::setup(){
     }
     
     // PARAMETERS ------------------------------
-    parameters.setName("folderkit");
+    parameters.setName("substrata");
         for( size_t i=0; i<NUMSAMPLERS; ++i ){
             driveControl >> samplers[i].in("clip_input");
             clipControl >> samplers[i].in("clip_threshold");
@@ -167,7 +167,7 @@ void ofApp::keyPressed(int key){
 //--------------------------------------------------------------
 void ofApp::exit(){
     library.free();
-    std::cout<<"[ folderkit ] resources cleanly released\n";
+    std::cout<<"[ substrata ] resources cleanly released\n";
 }
 
 //--------------------------------------------------------------
