@@ -76,6 +76,8 @@ void ofApp::setup(){
     sub >> limiter.ch(0);
     sub >> limiter.ch(1);
 
+    zap >> limiter.ch(0);
+    zap >> limiter.ch(1);
     noise.out("L") >> limiter.ch(0);
     noise.out("R") >> limiter.ch(1);
 
@@ -90,6 +92,7 @@ void ofApp::setup(){
     osc.linkTempo( "/orca/bpm" );
 
     sub.oscMapping( osc, "/s", &table );
+    zap.oscMapping( osc, "/z", &table );
     noise.oscMapping( osc, "/x", &table );
     
     for(size_t i=0; i<NUMSAMPLERS; ++i ){
@@ -120,7 +123,9 @@ void ofApp::setup(){
         parameters.add( reverb.parameters );
         parameters.add( table.parameters );
         parameters.add( sub.parameters );
+        parameters.add( zap.parameters );
         parameters.add( noise.parameters );
+
         
     live.watch( parameters, path + "/settings.json");
 

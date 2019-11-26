@@ -40,6 +40,7 @@
 #include "LiveParameters.h"
 #include "FMSub.h"
 #include "NoiseDevice.h"
+#include "SinePercussion.h"
 
 class ofApp : public ofBaseApp{
 
@@ -77,6 +78,7 @@ class ofApp : public ofBaseApp{
         folderkit::IRVerb ireverb;
         np::synth::FMSub sub;
         np2::synth::NoiseDevice noise;
+        np2::synth::SinePercussion zap;
  
  
         np::tuning::ModalTable table;
