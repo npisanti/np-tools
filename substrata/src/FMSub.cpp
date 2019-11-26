@@ -88,6 +88,8 @@ void np::synth::FMSub::patch(){
     parameters.add( modEnvReleaseControl.set("mod release", 50, 5, 600 ) );    
     parameters.add( saturator.parameters );
     
+    bTrig = false;
+    bPitch = false;
 }
 
 void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, np::tuning::ModalTable * table ){
@@ -96,6 +98,10 @@ void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, 
     osc.out_value( address, 0 ) >> pitchNode;
     osc.parser( address, 0 ) = [&, table]( float value ) noexcept {
         int i = value;
+        if( m1 != i ){
+            bPitch = true;
+        }
+        m1 = i;
         float p = table->pitches[i%table->degrees];
         int o = i / table->degrees;
         p += o*12.0f;
@@ -108,6 +114,7 @@ void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, 
         if( value == 0.0f ) {
             return pdsp::osc::Ignore;
         }
+        bTrig = true;
         return value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
     };
     

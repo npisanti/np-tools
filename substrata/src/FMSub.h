@@ -32,17 +32,18 @@ class FMSub : public pdsp::Patchable {
 
 public:
 
-    // synth public API --------------------------------------
-
     FMSub(){ patch(); }
     FMSub( const FMSub& other ){ patch(); }
 
     pdsp::Patchable& in_trig();
     pdsp::Patchable& in_pitch();
-
     
     float meter_mod_env() const;
     float meter_pitch() const;
+
+    std::atomic<int> m1;
+    std::atomic<bool> bTrig;
+    std::atomic<bool> bPitch;
 
     ofParameterGroup    parameters;
 
@@ -51,6 +52,7 @@ public:
     void oscMapping( pdsp::osc::Input & osc, std::string address, np::tuning::ModalTable * table );
 
     void patch();
+    
     // ------- parameters ------------------------------------
 
     pdsp::PatchNode     voiceTrigger;

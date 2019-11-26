@@ -62,6 +62,8 @@ void np2::synth::NoiseDevice::patch() {
     parameters.add( filterTypeControl.set("filter mode", 0, 0, 5 ) );
     parameters.add( filterResoControl.set("filter reso", 0.0f, 0.0f, 1.0f ) );
     parameters.add( lowcutControl.set("lowcut", 100, 20, 1000 ) );
+    
+    bTrig = false;
 }
 
 void np2::synth::NoiseDevice::oscMapping( pdsp::osc::Input & osc, std::string address, np::tuning::ModalTable * table ){
@@ -71,6 +73,7 @@ void np2::synth::NoiseDevice::oscMapping( pdsp::osc::Input & osc, std::string ad
     osc.out_value( address, 0 ) >> noise.in_pitch();
     osc.parser( address, 0 ) = [&, table]( float value ) noexcept {
         int i = value;
+        m1 = i;
         float p = table->pitches[i%table->degrees];
         int o = i / table->degrees;
         p += o*12.0f;
@@ -80,6 +83,8 @@ void np2::synth::NoiseDevice::oscMapping( pdsp::osc::Input & osc, std::string ad
     osc.out_trig( address, 1 ) >> trigger;
     osc.out_trig( address, 1 ) >> env.in_release();
     osc.parser( address , 1) = [&]( float value ) noexcept {
+        m2 = value;
+        bTrig = true;
         return 5 + value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
     };
     

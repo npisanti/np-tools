@@ -53,6 +53,10 @@ public:
 
     void oscMapping( pdsp::osc::Input & osc, std::string address, np::tuning::ModalTable * table );
     
+    std::atomic<int> m1;
+    std::atomic<int> m2;
+    std::atomic<bool> bTrig;
+    
 private:
     void patch();
 

@@ -32,7 +32,7 @@ void np2::synth::SinePercussion::patch(){
     triggers >> aEnv >> amp.in_mod();    
     triggers >> pEnv.set( 0.0f, 0.0f, 0.0f ) >> pModAmt >> sine.in_pitch();
 
-    
+    bTrig = false;
 
     gainControl >> dBtoLin  >> gain.in_mod();
     
@@ -57,6 +57,7 @@ void np2::synth::SinePercussion::oscMapping( pdsp::osc::Input & osc, std::string
         float p = table->pitches[i%table->degrees];
         int o = i / table->degrees;
         p += o*12.0f;
+        m1 = i;
         return p;  
     };       
 
@@ -64,10 +65,12 @@ void np2::synth::SinePercussion::oscMapping( pdsp::osc::Input & osc, std::string
     osc.out_trig( address, 1 ) >> aEnv.in_hold();
     osc.out_trig( address, 1 ) >> pEnv.in_release();
     osc.parser( address , 1) = [&]( float value ) noexcept {
+        m2 = value;
         value *= (1.0f/16.0f);
         value = (value<1.0) ? value : 1.0;
         value = value * value;
         value = 5 + value * 1000;
+        bTrig = true;
         return value;  
     };
     

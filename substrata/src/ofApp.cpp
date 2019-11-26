@@ -151,6 +151,35 @@ void ofApp::update(){
                 sender.sendMessage(m, false);
             }
         }
+        if( zap.bTrig ){
+            zap.bTrig = false;
+            ofxOscMessage m;
+            m.setAddress("/zap");
+            m.addIntArg( zap.m1 );
+            m.addIntArg( zap.m2 ); 
+            sender.sendMessage(m, false);
+        }
+        if( noise.bTrig ){
+            noise.bTrig = false;
+            ofxOscMessage m;
+            m.setAddress("/noise");
+            m.addIntArg( noise.m1 );
+            m.addIntArg( noise.m2 ); 
+            sender.sendMessage(m, false);
+        }
+        if( sub.bTrig ){
+            sub.bTrig = false;
+            ofxOscMessage m;
+            m.setAddress("/sub/trigger");
+            sender.sendMessage(m, false);
+        }
+        if( sub.bPitch ){
+            sub.bPitch = false;
+            ofxOscMessage m;
+            m.setAddress("/sub/pitch");
+            m.addIntArg( noise.m1 ); 
+            sender.sendMessage(m, false);
+        }
     }
 }
 
