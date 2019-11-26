@@ -44,6 +44,13 @@ void ofApp::setup(){
     bool bUseIR = ireverb.load( path + "/IR" );
     
     // --------------------------------------------
+
+    clipControl >> clip0.in_threshold();
+    clipControl >> clip1.in_threshold();
+    clip0.setOversampleLevel(2);
+    clip1.setOversampleLevel(2);
+    upsampler0 >> clip0 >> downsampler0 >> clipOutput.ch(0) >> limiter.ch(0);
+    upsampler1 >> clip1 >> downsampler1 >> clipOutput.ch(1) >> limiter.ch(1);
     
     for( int i=0; i<NUMSAMPLERS; ++i ){
         std::cout<< "[ substrata ] initializating sampler "<<i<<"\n";
@@ -63,12 +70,18 @@ void ofApp::setup(){
     if(bUseIR){
         sub * dB(-21.0f) >> reverbSend.ch(0);
         sub * dB(-21.0f) >> reverbSend.ch(1);
+        zap * dB(-21.0f) >> reverbSend.ch(0);
+        zap * dB(-21.0f) >> reverbSend.ch(1);
+        noise.out("L") * dB(-27.0f) >> reverbSend.ch(0);
+        noise.out("R") * dB(-27.0f) >> reverbSend.ch(1);
         reverbSend.ch(0) >> ireverb.cut0;
         reverbSend.ch(1) >> ireverb.cut1; 
         ireverb.rev0 * dB(-24.0f) >> limiter.ch(0);
         ireverb.rev1 * dB(-24.0f) >> limiter.ch(1);
     }else{
         sub * dB(-21.0f) >> reverbSend >> reverb;
+        zap * dB(-21.0f) >> reverbSend >> reverb;
+        noise.out("L") * dB(-27.0f) >> reverbSend >> reverb;
         reverb.ch(0) >> limiter.ch(0);
         reverb.ch(1) >> limiter.ch(1);
     }
@@ -76,10 +89,10 @@ void ofApp::setup(){
     sub >> limiter.ch(0);
     sub >> limiter.ch(1);
 
-    zap >> limiter.ch(0);
-    zap >> limiter.ch(1);
-    noise.out("L") >> limiter.ch(0);
-    noise.out("R") >> limiter.ch(1);
+    zap >> upsampler0;
+    zap >> upsampler1;
+    noise.out("L") >> upsampler0;
+    noise.out("R") >> upsampler1;
 
     table.tonalControl >> sub.in("modulator");
     
@@ -117,7 +130,8 @@ void ofApp::setup(){
         general.add( driveControl.set("samplers_drive", 12, -48, 24) );
         general.add( clipControl.set("clippers_threshold", -2, -12, 1) );
         general.add( gainControl.set("samplers_gain", -12, -48, 24) );
-        general.add( reverbSend.set("reverb_send", -18, -48, 24) );parameters.add( general );        
+        general.add( reverbSend.set("reverb_send", -18, -48, 24) );    
+        general.add( clipOutput.set("synthpercs_out", -12, -48, 24) );parameters.add( general );        
         
         parameters.add( limiter.parameters );
         parameters.add( reverb.parameters );

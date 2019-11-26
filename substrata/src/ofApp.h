@@ -32,6 +32,7 @@
 #include "effect/StereoDelay.h"
 #include "meter/RMS.h"
 #include "dynamics/Brickwall.h"
+#include "dynamics/SoftClip.h"
 
 #include "ModalTable.h"
 #include "Library.h"
@@ -80,9 +81,18 @@ class ofApp : public ofBaseApp{
         np2::synth::NoiseDevice noise;
         np2::synth::SinePercussion zap;
  
- 
         np::tuning::ModalTable table;
  
+ 
+        // stereo clipper
+        pdsp::SoftClip clip0;
+        pdsp::IIRUpSampler2x upsampler0;
+        pdsp::IIRDownSampler2x downsampler0; 
+        pdsp::SoftClip clip1;
+        pdsp::IIRUpSampler2x upsampler1;
+        pdsp::IIRDownSampler2x downsampler1; 
+        pdsp::ParameterGain clipOutput; 
+     
         //pdsp::ParameterAmp enableReverb;
         //pdsp::ParameterAmp enableDelays;
         pdsp::ParameterGain reverbSend;
