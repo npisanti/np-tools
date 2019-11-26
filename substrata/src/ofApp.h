@@ -21,7 +21,7 @@
 
 #pragma once
 
-#define NUMSAMPLERS 16
+#define NUMSAMPLERS 12
 
 #include "ofMain.h"
 #include "ofxMidi.h"
