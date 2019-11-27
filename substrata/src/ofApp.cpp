@@ -45,6 +45,10 @@ void ofApp::setup(){
     
     // --------------------------------------------
 
+    synths.setup( path );
+    synths.gain.ch(0) >> limiter.ch(0);
+    synths.gain.ch(1) >> limiter.ch(1);
+
     clipControl >> clip0.in_threshold();
     clipControl >> clip1.in_threshold();
     clip0.setOversampleLevel(2);
@@ -68,10 +72,12 @@ void ofApp::setup(){
     }
     
     if(bUseIR){
-        sub * dB(-21.0f) >> reverbSend.ch(0);
-        sub * dB(-21.0f) >> reverbSend.ch(1);
-        zap * dB(-21.0f) >> reverbSend.ch(0);
-        zap * dB(-21.0f) >> reverbSend.ch(1);
+        synths.gain.ch(0) >> reverbSend.ch(0);
+        synths.gain.ch(1) >> reverbSend.ch(1);
+        sub * dB(-27.0f) >> reverbSend.ch(0);
+        sub * dB(-27.0f) >> reverbSend.ch(1);
+        zap * dB(-27.0f) >> reverbSend.ch(0);
+        zap * dB(-27.0f) >> reverbSend.ch(1);
         noise.out("L") * dB(-27.0f) >> reverbSend.ch(0);
         noise.out("R") * dB(-27.0f) >> reverbSend.ch(1);
         reverbSend.ch(0) >> ireverb.cut0;
@@ -79,6 +85,8 @@ void ofApp::setup(){
         ireverb.rev0 * dB(-24.0f) >> limiter.ch(0);
         ireverb.rev1 * dB(-24.0f) >> limiter.ch(1);
     }else{
+        synths.gain.ch(0) >> reverbSend;
+        synths.gain.ch(1) >> reverbSend;
         sub * dB(-21.0f) >> reverbSend >> reverb;
         zap * dB(-21.0f) >> reverbSend >> reverb;
         noise.out("L") * dB(-27.0f) >> reverbSend >> reverb;
@@ -107,6 +115,7 @@ void ofApp::setup(){
     sub.oscMapping( osc, "/s", &table );
     zap.oscMapping( osc, "/z", &table );
     noise.oscMapping( osc, "/x", &table );
+    synths.oscMapping( osc, &table );
     
     for(size_t i=0; i<NUMSAMPLERS; ++i ){
         std::string address = "/";
@@ -139,6 +148,7 @@ void ofApp::setup(){
         parameters.add( sub.parameters );
         parameters.add( zap.parameters );
         parameters.add( noise.parameters );
+        parameters.add( synths.parameters );
 
         
     live.watch( parameters, path + "/settings.json");
@@ -162,6 +172,18 @@ void ofApp::update(){
                 m.setAddress("/sample");
                 m.addIntArg( t ); // instrument 
                 m.addIntArg( i ); // samoler
+                sender.sendMessage(m, false);
+            }
+        }
+        for( size_t i=0; i<synths.voices.size(); ++i ){
+            if( synths.voices[i].bTrig ){
+                synths.voices[i].bTrig = false;
+                ofxOscMessage m;
+                m.setAddress("/synth");
+                m.addIntArg( i ); // instrument 
+                m.addIntArg( synths.voices[i].m1 ); // pitch
+                m.addIntArg( synths.voices[i].m2 ); // wave
+                m.addIntArg( synths.voices[i].m3 ); // env amt
                 sender.sendMessage(m, false);
             }
         }
