@@ -129,22 +129,26 @@ void substrata::Sampler::linkToLibrary( substrata::Library & library ){
 
 void substrata::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address, np::tuning::ModalTable * table ){
     
-    osc.out_trig( address, 0 ) >> selectNode;
-    osc.out_trig( address, 0 ) >> triggers;
     osc.parser( address , 0) = [&]( float value ) noexcept {
+        subfolder = value;
+        return pdsp::osc::Ignore;
+    };
+
+    osc.out_trig( address, 1 ) >> selectNode;
+    osc.out_trig( address, 1 ) >> triggers;
+    osc.parser( address , 1) = [&]( float value ) noexcept {
         //std::cout<<"received message\n";
         instrument = value;
         if( value!=0.0f && pLibrary->availables[instrument] ){
-            pLibrary->correlate( instrument, value );
-            return value;
+            return pLibrary->correlate( instrument, subfolder );
         }else{
             return pdsp::osc::Ignore;
         }
     };
 
-    osc.out_value( address, 1 ) >> samplers[0].in_pitch();
-    osc.out_value( address, 1 ) >> samplers[1].in_pitch();
-    osc.parser( address, 1 ) = [&, table]( float value ) noexcept {
+    osc.out_value( address, 2 ) >> samplers[0].in_pitch();
+    osc.out_value( address, 2 ) >> samplers[1].in_pitch();
+    osc.parser( address, 2 ) = [&, table]( float value ) noexcept {
         int i = value;
         if( i >= 24 ){
             i -= 36;
@@ -156,10 +160,10 @@ void substrata::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
         return p;  
     };       
 
-    osc.out_value( address, 2 ) * (1.0f/32.0f) >> startNode;
+    osc.out_value( address, 3 ) * (1.0f/32.0f) >> startNode;
     
-    osc.out_value( address, 3 ) >> pan.in_pan();
-    osc.parser(address, 3) = [&]( float value ) noexcept {
+    osc.out_value( address, 4 ) >> pan.in_pan();
+    osc.parser(address, 4) = [&]( float value ) noexcept {
         int pan = value;
         if( pan > 9 ) pan = 9;
         switch( pan ){
@@ -175,8 +179,8 @@ void substrata::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
         }
     };      
 
-    osc.out_value( address, 4 ) >> env.in_attack();
-    osc.parser(address, 4) = [&]( float value ) noexcept {
+    osc.out_value( address, 5 ) >> env.in_attack();
+    osc.parser(address, 5) = [&]( float value ) noexcept {
         value *= (1.0f/16.0f);
         value = (value<1.0) ? value : 1.0;
         value = value * value;
@@ -185,9 +189,9 @@ void substrata::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
         
     };      
         
-    osc.initTo( address, 5, 10000.0f );
-    osc.out_value( address, 5 ) >> env.in_release();
-    osc.parser(address, 5) = [&]( float value ) noexcept {
+    osc.initTo( address, 6, 10000.0f );
+    osc.out_value( address, 6 ) >> env.in_release();
+    osc.parser(address, 6) = [&]( float value ) noexcept {
         if( value == 0.0f ){
             return 7500.0f;
         }else{
@@ -199,8 +203,8 @@ void substrata::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
         }
     };      
 
-    osc.out_value( address, 6 ) >> comb.in_feedback();
-    osc.parser(address, 6) = [&]( float value ) noexcept {
+    osc.out_value( address, 7 ) >> comb.in_feedback();
+    osc.parser(address, 7) = [&]( float value ) noexcept {
         value *= (1.0f/9.0f);
         value = (value<1.0f) ? value : 1.0f;
         value = 1.0f-value;
@@ -210,8 +214,8 @@ void substrata::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
         return value;  
     };      
     
-    osc.out_value( address, 7 ) >> comb.in_pitch();
-    osc.parser( address, 7 ) = [&, table]( float value ) noexcept {
+    osc.out_value( address, 8 ) >> comb.in_pitch();
+    osc.parser( address, 8 ) = [&, table]( float value ) noexcept {
         int i = value;
         float p = table->pitches[i%table->degrees];
         int o = i / table->degrees;

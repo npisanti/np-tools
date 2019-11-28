@@ -100,6 +100,7 @@ private:
     int tPast;
 
     std::atomic<int> instrument;
+    std::atomic<int> subfolder;
 
 };   
     
