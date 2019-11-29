@@ -15,15 +15,28 @@ float substrata::Library::correlate( int instrument, int subfolder ){
     auto & corr = correlations[instrument][subfolder];
     int r = corr.range;
     int x = corr.now;
-    if( r < 3 ){ // rule : at least 3 samples for round robin 
-        return float(x);
-    }else{
-        while( x == corr.now ){
-            x = pdsp::dice(r) + corr.sampleMin;
-        }
-        corr.now = x;
-        return float(x);
+    
+    switch ( r ){
+        case 1: break;
+        
+        case 2:
+            if( x == corr.sampleMin ){
+                x++;
+            }else{
+                x = corr.sampleMin;
+            }
+            corr.now = x;
+        break;
+        
+        default :
+            while( x == corr.now ){
+                x = pdsp::dice(r) + corr.sampleMin;
+            }
+            corr.now = x;
+        break;
     }
+    
+    return float(x);
 }
     
 void substrata::Library::init( std::string path ){
