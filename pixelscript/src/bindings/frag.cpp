@@ -70,7 +70,7 @@ void apply( const char * name ){
             buffer->swap();
 
             buffer->begin();
-                //ofClear( 0, 0, 0, 0 );
+                ofClear( 0, 0, 0, 0 );
 
                 current->shader.begin();
     
