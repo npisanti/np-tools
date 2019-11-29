@@ -29,6 +29,10 @@ void np::synth::FMSub::patch(){
     addModuleInput("hold", ampEnv.in_hold() );
     addModuleOutput("signal", saturator);
 
+    modEnv.setReleaseCurve( 1.0f );
+    ampEnv.setReleaseCurve( 1.0f );
+
+
     pitchNode >> carrierA.in_pitch();
     pitchNode >> carrierB.in_pitch();
     
@@ -123,7 +127,16 @@ void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, 
     osc.out_value( address, 2 ) * (1.0f/64.0f) >> carrierB.in_fb();
     
     osc.out_value( address, 3 ) * (1.0f/8.0f) >> fm_mod.in_mod();
-    
+
+    osc.out_value( address, 4 ) >> modEnv.in_attack();
+    osc.parser( address , 4) = [&]( float value ) noexcept {
+        return value * pdsp::Clockable::getOneBarTimeMs() * (0.5f/16.0f);
+    };
+
+    osc.out_value( address, 5 ) >> modEnv.in_release();
+    osc.parser( address , 5) = [&]( float value ) noexcept {
+        return value * pdsp::Clockable::getOneBarTimeMs() * (0.5f/16.0f);
+    };
 }
 
 float np::synth::FMSub::meter_mod_env() const{
