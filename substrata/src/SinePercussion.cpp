@@ -60,11 +60,13 @@ void np2::synth::SinePercussion::oscMapping( pdsp::osc::Input & osc, std::string
         m1 = i;
         return p;  
     };       
+    
+    osc.out_value( address, 1 ) * 12.0f >> pModAmt.in_mod();
 
-    osc.out_trig( address, 1 ) >> triggers;
-    osc.out_trig( address, 1 ) >> aEnv.in_hold();
-    osc.out_trig( address, 1 ) >> pEnv.in_release();
-    osc.parser( address , 1) = [&]( float value ) noexcept {
+    osc.out_trig( address, 2 ) >> triggers;
+    osc.out_trig( address, 2 ) >> aEnv.in_hold();
+    osc.out_trig( address, 2 ) >> pEnv.in_release();
+    osc.parser( address , 2) = [&]( float value ) noexcept {
         m2 = value;
         value *= (1.0f/16.0f);
         value = (value<1.0) ? value : 1.0;
@@ -73,9 +75,6 @@ void np2::synth::SinePercussion::oscMapping( pdsp::osc::Input & osc, std::string
         bTrig = true;
         return value;  
     };
-    
-    osc.out_value( address, 2 ) * 12.0f >> pModAmt.in_mod();
-    
 }
 
 ofParameterGroup & np2::synth::SinePercussion::label( string name ){
@@ -86,6 +85,7 @@ ofParameterGroup & np2::synth::SinePercussion::label( string name ){
 void np2::synth::SinePercussion::enableDB( float minValue ){
     aEnv.enableDBTriggering( minValue, 0.0f);
 }
+
 void np2::synth::SinePercussion::disableDB( ){
     aEnv.disableDBTriggering( );
 }

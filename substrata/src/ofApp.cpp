@@ -62,8 +62,8 @@ void ofApp::setup(){
         //samplers[i].rms >> engine.blackhole();
         
         if( bUseIR ){
-            samplers[i].ch(0) >> reverbSend.ch(0);
-            samplers[i].ch(1) >> reverbSend.ch(1);
+            samplers[i].ch(0) * dB(-12.0f) >> reverbSend.ch(0);
+            samplers[i].ch(1) * dB(-12.0f)  >> reverbSend.ch(1);
         }else{
             samplers[i].out("signal") >> reverbSend;
         }
@@ -170,8 +170,9 @@ void ofApp::update(){
             if( t!=-1 ){
                 ofxOscMessage m;
                 m.setAddress("/sample");
-                m.addIntArg( t ); // instrument 
                 m.addIntArg( i ); // samoler
+                m.addIntArg( t ); // instrument 
+                m.addIntArg( samplers[i].subfolder ); // instrument 
                 sender.sendMessage(m, false);
             }
         }

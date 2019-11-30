@@ -23,8 +23,8 @@
 
 void substrata::Sampler::patch (){
     
-    float sample_drift_amount = 0.05f;
-    float comb_drift_amount = 0.06f;
+    float sample_drift_amount = 0.04f;
+    float comb_drift_amount = 0.04f;
     
     addModuleInput("clip_input", inputControl );
     addModuleInput("clip_threshold", clip.in_threshold() );
@@ -205,7 +205,7 @@ void substrata::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
 
     osc.out_value( address, 7 ) >> comb.in_feedback();
     osc.parser(address, 7) = [&]( float value ) noexcept {
-        value *= (1.0f/9.0f);
+        value *= (1.0f/16.0f);
         value = (value<1.0f) ? value : 1.0f;
         value = 1.0f-value;
         value = value * value;

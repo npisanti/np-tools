@@ -57,6 +57,9 @@ public:
     pdsp::Parameter        lowCutControl;    
     
     pdsp::ADSR          fadeEnvs[2];
+
+    std::atomic<int> instrument;
+    std::atomic<int> subfolder;
     
 private:
     void patch ();
@@ -98,10 +101,6 @@ private:
     
     int cursor;    
     int tPast;
-
-    std::atomic<int> instrument;
-    std::atomic<int> subfolder;
-
 };   
     
 } // end namespaces
