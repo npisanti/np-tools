@@ -12,61 +12,34 @@ void np2::synth::WaveSynth::setup( std::string path ){
    
     // ------ null wave ------
     wt.addEmpty(); 
-   
+    wt.addSineWave();
+    wt.addTriangleWave( 64 );
+    wt.addSawWave( 64 );
+    wt.addSquareWave( 64 );
+    
     // ------ organ waves ----
-    wt.addAdditiveWave ( { 1.0f, 0.0f } ); 
     wt.addAdditiveWave ( { 1.0f, 1.0f } ); 
     wt.addAdditiveWave ( { 1.0f, 0.0f, 0.0f, 1.0f } ); 
     wt.addAdditiveWave ( { 1.0f, 1.0f, 1.0f, 1.0f } ); 
     wt.addAdditiveWave ( { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f } ); 
     wt.addAdditiveWave ( { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f } ); 
 
+/*
     for( int i=1; i<8; ++i ){
         
         float correct = 1.0f;
         switch( i ){ // some volume corrections 
             case 1: correct = 0.5; break;
-            case 2: correct = 0.6; break;
-            case 3: correct = 0.7; break;
-            case 4: correct = 0.8; break;
+            case 5: correct = 0.6; break;
+            case 6: correct = 0.7; break;
+            case 7: correct = 0.8; break;
         }
         
         for(int n=0; n<wt.tableLength(); n++){
             wt.table(i)[n] *=  correct;
         }
     }
-
-    // --- NOISY WAVEs ---
-    wt.addEmpty(); 
-    int index = wt.size() -1;
-    for(int n=0; n<wt.tableLength(); n++){
-        wt.table(index)[n] = pdsp::brand();  
-    }
-    
-    wt.addEmpty(); 
-    index = wt.size() -1;
-    int pulse = wt.tableLength() / 4;
-    // setting the wavetable buffer
-    for(int n=0; n<wt.tableLength(); n++){
-        if(n<pulse){
-            wt.table(index)[n] = pdsp::brand(); 
-        }else{
-            wt.table(index)[n] = 0.0f;
-        }
-    }
-    
-    wt.addEmpty(); 
-    index = wt.size() -1;
-    pulse = wt.tableLength() / 16;
-    // setting the wavetable buffer
-    for(int n=0; n<wt.tableLength(); n++){
-        if(n<pulse){
-            wt.table(index)[n] = pdsp::brand(); 
-        }else{
-            wt.table(index)[n] = 0.0f;
-        }
-    }
-    
+*/
     // --- SAVED WAVES ----
     loadWaves( path + "/waves" );
 
