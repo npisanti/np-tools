@@ -1,6 +1,7 @@
 
 sampler arguments ( address `/a` - `/l` )
-- sample 
+- subfolder 
+- folder 
 - pitch 
 - position
 - pan 

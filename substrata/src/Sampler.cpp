@@ -181,10 +181,10 @@ void substrata::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
 
     osc.out_value( address, 5 ) >> env.in_attack();
     osc.parser(address, 5) = [&]( float value ) noexcept {
-        value *= (1.0f/16.0f);
+        value *= (1.0f/9.0f);
         value = (value<1.0) ? value : 1.0;
         value = value * value;
-        value = value * 1000;
+        value = value * 250;
         return value;               
         
     };      
@@ -195,20 +195,20 @@ void substrata::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
         if( value == 0.0f ){
             return 7500.0f;
         }else{
-            value *= (1.0f/16.0f);
+            value *= (1.0f/9.0f);
             value = (value<1.0) ? value : 1.0;
             value = value * value;
-            value = value * 2000;
+            value = value * 500;
             return value;  
         }
     };      
 
     osc.out_value( address, 7 ) >> comb.in_feedback();
     osc.parser(address, 7) = [&]( float value ) noexcept {
-        value *= (1.0f/16.0f);
+        value *= (1.0f/9.0f);
         value = (value<1.0f) ? value : 1.0f;
         value = 1.0f-value;
-        value = value * value;
+        value = value * value * value;
         value = 1.0f-value;      
         value *= 0.999f;  
         return value;  

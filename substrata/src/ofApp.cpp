@@ -63,7 +63,7 @@ void ofApp::setup(){
         
         if( bUseIR ){
             samplers[i].ch(0) * dB(-12.0f) >> reverbSend.ch(0);
-            samplers[i].ch(1) * dB(-12.0f)  >> reverbSend.ch(1);
+            samplers[i].ch(1) * dB(-12.0f) >> reverbSend.ch(1);
         }else{
             samplers[i].out("signal") >> reverbSend;
         }
@@ -72,8 +72,8 @@ void ofApp::setup(){
     }
     
     if(bUseIR){
-        synths.gain.ch(0) >> reverbSend.ch(0);
-        synths.gain.ch(1) >> reverbSend.ch(1);
+        synths.gain.ch(0) * dB( -12.0f ) >> reverbSend.ch(0);
+        synths.gain.ch(1) * dB( -12.0f )  >> reverbSend.ch(1);
         sub * dB(-27.0f) >> reverbSend.ch(0);
         sub * dB(-27.0f) >> reverbSend.ch(1);
         zap * dB(-27.0f) >> reverbSend.ch(0);
