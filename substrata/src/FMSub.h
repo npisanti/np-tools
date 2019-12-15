@@ -78,6 +78,9 @@ public:
     pdsp::LFOPhazor         phazorFree;
     pdsp::TriggeredRandom   rnd;
     pdsp::OnePole           randomSlew;
+    
+    pdsp::Parameter         highcutControl;
+    pdsp::HighCut           highcut;
 
     pdsp::Amp  fm_mod;
 

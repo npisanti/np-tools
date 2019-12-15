@@ -27,6 +27,8 @@ void np2::synth::SinePercussion::patch(){
     addModuleOutput("signal", gain ); 
     addModuleOutput("env", aEnv ); 
 
+    aEnv.setReleaseCurve( 1.0f );
+
     //patching
     sine >> amp >> gain;
     triggers >> aEnv >> amp.in_mod();    
@@ -35,7 +37,6 @@ void np2::synth::SinePercussion::patch(){
     bTrig = false;
 
     gainControl >> dBtoLin  >> gain.in_mod();
-    
     
     envAttackControl  >> aEnv.in_attack();
     envHoldControl    >> aEnv.in_hold();
@@ -60,19 +61,23 @@ void np2::synth::SinePercussion::oscMapping( pdsp::osc::Input & osc, std::string
         m1 = i;
         return p;  
     };       
-    
-    osc.out_value( address, 1 ) * 12.0f >> pModAmt.in_mod();
 
-    osc.out_trig( address, 2 ) >> triggers;
-    osc.out_trig( address, 2 ) >> aEnv.in_hold();
-    osc.out_trig( address, 2 ) >> pEnv.in_release();
-    osc.parser( address , 2) = [&]( float value ) noexcept {
+    osc.out_trig( address, 1 ) >> triggers;
+    osc.out_trig( address, 1 ) >> aEnv.in_hold();
+    osc.out_trig( address, 1 ) >> aEnv.in_release();
+    osc.parser( address , 1) = [&]( float value ) noexcept {
+        return 1.0f + value * pdsp::Clockable::getOneBarTimeMs() * (0.5f/16.0f);
+    };
+    
+    osc.out_value( address, 2 ) * 12.0f >> pModAmt.in_mod();
+
+    osc.out_trig( address, 3 ) >> pEnv.in_release();
+    osc.parser( address , 3 ) = [&]( float value ) noexcept {
         m2 = value;
         value *= (1.0f/16.0f);
         value = (value<1.0) ? value : 1.0;
         value = value * value;
         value = 5 + value * 1000;
-        bTrig = true;
         return value;  
     };
 }

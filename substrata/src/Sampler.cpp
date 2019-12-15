@@ -23,8 +23,8 @@
 
 void substrata::Sampler::patch (){
     
-    float sample_drift_amount = 0.04f;
-    float comb_drift_amount = 0.04f;
+    float sample_drift_amount = 0.03f;
+    float comb_drift_amount = 0.05f;
     
     addModuleInput("clip_input", inputControl );
     addModuleInput("clip_threshold", clip.in_threshold() );

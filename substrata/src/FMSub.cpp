@@ -48,7 +48,9 @@ void np::synth::FMSub::patch(){
     osc_mix >> oscXFader.in_fade();
     
     //oscXFader >> voiceAmp >> gain;
-    oscXFader >> voiceAmp >> saturator;
+    oscXFader >> voiceAmp >> highcut >> saturator;
+    
+    highcutControl >> highcut.in_freq();
     
     // MODULATIONS AND CONTROL
     modEnv >> fm_mod >> fmAmp.in_mod();
@@ -91,6 +93,7 @@ void np::synth::FMSub::patch(){
     parameters.add( modEnvHoldControl.set( "mod hold",  40, 0, 300 ) );
     parameters.add( modEnvReleaseControl.set("mod release", 50, 5, 600 ) );    
     parameters.add( saturator.parameters );
+    parameters.add( highcutControl.set("high_cut", 200, 20, 20000) );
     
     bTrig = false;
     bPitch = false;
@@ -112,28 +115,27 @@ void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, 
         return p;  
     };       
 
-    osc.out_trig( address, 1 ) >> ampEnv.in_hold();
+    osc.out_trig( address, 1 ) >> ampEnv.in_attack();
     osc.parser( address , 1) = [&]( float value ) noexcept {
+        bTrig = true;
+        return value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
+    };
+
+    osc.out_trig( address, 2 ) >> ampEnv.in_hold();
+    osc.out_trig( address, 2 ) >> voiceTrigger;
+    osc.parser( address , 2) = [&]( float value ) noexcept {
+        return 1.0f + value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
+    };
+    
+    osc.out_trig( address, 3 ) >> ampEnv.in_release();
+    osc.parser( address , 3) = [&]( float value ) noexcept {
         return value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
     };
     
-    osc.out_trig( address, 2 ) >> voiceTrigger;
-    osc.out_trig( address, 2 ) >> ampEnv.in_attack();
-    osc.out_trig( address, 2 ) >> ampEnv.in_release();
-    osc.parser( address , 2) = [&]( float value ) noexcept {
-        bTrig = true;
-        return 40 + value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
-    };
-    
-/*
-    osc.out_value( address, 2 ).enableSmoothing(50.0f);
-    osc.out_value( address, 2 ) * (1.0f/64.0f) >> carrierA.in_fb();
-    osc.out_value( address, 2 ) * (1.0f/64.0f) >> carrierB.in_fb();
-*/    
-    osc.out_value( address, 3 ) * (1.0f/8.0f) >> fm_mod.in_mod();
+    osc.out_value( address, 4 ) * 0.5f >> fm_mod.in_mod();
 
-    osc.out_value( address, 4 ) >> modEnv.in_release();
-    osc.parser( address , 4) = [&]( float value ) noexcept {
+    osc.out_value( address, 5 ) >> modEnv.in_release();
+    osc.parser( address , 5) = [&]( float value ) noexcept {
         return value * pdsp::Clockable::getOneBarTimeMs() * (0.5f/16.0f);
     };
 }

@@ -21,7 +21,7 @@
 
 #pragma once
 
-#define NUMSAMPLERS 12
+#define NUMSAMPLERS 15
 
 #include "ofMain.h"
 #include "ofxMidi.h"
@@ -81,7 +81,7 @@ class ofApp : public ofBaseApp{
         np::synth::FMSub sub;
         np2::synth::NoiseDevice noise;
         np2::synth::SinePercussion zap;
-        np2::synth::WaveSynth synths;
+        //np2::synth::WaveSynth synths;
     
         np::tuning::ModalTable table;
  
@@ -108,7 +108,6 @@ class ofApp : public ofBaseApp{
    
         np::dynamics::Brickwall limiter;
         
-
         bool bDrawGui;
         
         substrata::Library library;

@@ -45,9 +45,9 @@ void ofApp::setup(){
     
     // --------------------------------------------
 
-    synths.setup( path );
-    synths.gain.ch(0) >> limiter.ch(0);
-    synths.gain.ch(1) >> limiter.ch(1);
+    //synths.setup( path );
+    //synths.gain.ch(0) >> limiter.ch(0);
+    //synths.gain.ch(1) >> limiter.ch(1);
 
     clipControl >> clip0.in_threshold();
     clipControl >> clip1.in_threshold();
@@ -72,21 +72,21 @@ void ofApp::setup(){
     }
     
     if(bUseIR){
-        synths.gain.ch(0) * dB( -12.0f ) >> reverbSend.ch(0);
-        synths.gain.ch(1) * dB( -12.0f )  >> reverbSend.ch(1);
-        sub * dB(-27.0f) >> reverbSend.ch(0);
-        sub * dB(-27.0f) >> reverbSend.ch(1);
-        zap * dB(-27.0f) >> reverbSend.ch(0);
-        zap * dB(-27.0f) >> reverbSend.ch(1);
-        noise.out("L") * dB(-27.0f) >> reverbSend.ch(0);
-        noise.out("R") * dB(-27.0f) >> reverbSend.ch(1);
+        //synths.gain.ch(0) * dB( -12.0f ) >> reverbSend.ch(0);
+        //synths.gain.ch(1) * dB( -12.0f )  >> reverbSend.ch(1);
+        sub * dB(-30.0f) >> reverbSend.ch(0);
+        sub * dB(-30.0f) >> reverbSend.ch(1);
+        zap * dB(-30.0f) >> reverbSend.ch(0);
+        zap * dB(-30.0f) >> reverbSend.ch(1);
+        noise.out("L") * dB(-30.0f) >> reverbSend.ch(0);
+        noise.out("R") * dB(-30.0f) >> reverbSend.ch(1);
         reverbSend.ch(0) >> ireverb.cut0;
         reverbSend.ch(1) >> ireverb.cut1; 
         ireverb.rev0 * dB(-24.0f) >> limiter.ch(0);
         ireverb.rev1 * dB(-24.0f) >> limiter.ch(1);
     }else{
-        synths.gain.ch(0) >> reverbSend;
-        synths.gain.ch(1) >> reverbSend;
+        //synths.gain.ch(0) >> reverbSend;
+        //synths.gain.ch(1) >> reverbSend;
         sub * dB(-21.0f) >> reverbSend >> reverb;
         zap * dB(-21.0f) >> reverbSend >> reverb;
         noise.out("L") * dB(-27.0f) >> reverbSend >> reverb;
@@ -107,7 +107,7 @@ void ofApp::setup(){
     limiter.ch(0) >> engine.audio_out(0);
     limiter.ch(1) >> engine.audio_out(1);
  
-    std::vector<std::string> addresses = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"  };
+    std::vector<std::string> addresses = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" };
 
     // OSC mapping -----------------------------
     osc.linkTempo( "/orca/bpm" );
@@ -115,7 +115,7 @@ void ofApp::setup(){
     sub.oscMapping( osc, "/s", &table );
     zap.oscMapping( osc, "/z", &table );
     noise.oscMapping( osc, "/x", &table );
-    synths.oscMapping( osc, &table );
+    //synths.oscMapping( osc, &table );
     
     for(size_t i=0; i<NUMSAMPLERS; ++i ){
         std::string address = "/";
@@ -148,7 +148,7 @@ void ofApp::setup(){
         parameters.add( sub.parameters );
         parameters.add( zap.parameters );
         parameters.add( noise.parameters );
-        parameters.add( synths.parameters );
+        //parameters.add( synths.parameters );
 
         
     live.watch( parameters, path + "/settings.json");
@@ -176,6 +176,7 @@ void ofApp::update(){
                 sender.sendMessage(m, false);
             }
         }
+        /*
         for( size_t i=0; i<synths.voices.size(); ++i ){
             if( synths.voices[i].bTrig ){
                 synths.voices[i].bTrig = false;
@@ -188,6 +189,7 @@ void ofApp::update(){
                 sender.sendMessage(m, false);
             }
         }
+        */
         if( zap.bTrig ){
             zap.bTrig = false;
             ofxOscMessage m;
