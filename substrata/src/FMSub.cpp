@@ -39,7 +39,6 @@ void np::synth::FMSub::patch(){
     detune_ctrl * -1.0f >> carrierA.in_pitch();
     detune_ctrl         >> carrierB.in_pitch();
 
-    ratio_ctrl >> modulator.in_ratio();
 
     // SIGNAL PATH
     modulator >> fmAmp >> carrierA.in_fm() >> oscXFader.in_A();
@@ -80,9 +79,6 @@ void np::synth::FMSub::patch(){
     
     parameters.add( osc_mix.set("carrier mix", 0.0f, 0.0f, 1.0f) );
     parameters.add( detune_ctrl.set("detune", 0.0f, 0.0f, 0.5f) );
-    
-    parameters.add( ratio_ctrl.set( "ratio coarse", 1, 1, 13) );
-    parameters.add( ratio_ctrl.set( "ratio fine", 0.0f, -1.0f, 0.0f) );
 
     parameters.add( drift.set("drift", 0.0f, 0.0f, 1.0f) );    
     
@@ -132,11 +128,24 @@ void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, 
         return value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
     };
     
-    osc.out_value( address, 4 ) * 0.5f >> fm_mod.in_mod();
+    osc.out_value( address, 4 ) * 0.25f >> fm_mod.in_mod();
 
     osc.out_value( address, 5 ) >> modEnv.in_release();
     osc.parser( address , 5) = [&]( float value ) noexcept {
-        return value * pdsp::Clockable::getOneBarTimeMs() * (0.5f/16.0f);
+        value *= (1.0f/16.0f);
+        value = (value<1.0) ? value : 1.0;
+        value = value * value;
+        value = 5 + value * 600;
+        return value;  
+     };
+        
+    osc.out_value( address, 6 ) >> modulator.in_ratio();
+    osc.parser( address , 6) = [&]( float value ) noexcept {
+        if( value == 0.0f ){
+            return 1.0f;
+        }else{
+            return value;
+        }
     };
 }
 

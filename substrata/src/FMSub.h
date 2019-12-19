@@ -84,8 +84,6 @@ public:
 
     pdsp::Amp  fm_mod;
 
-    pdsp::Parameter     ratio_ctrl;
-
     pdsp::Parameter     drift;
     
     pdsp::Parameter     detune_ctrl;

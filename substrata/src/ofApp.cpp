@@ -56,9 +56,14 @@ void ofApp::setup(){
     upsampler0 >> clip0 >> downsampler0 >> clipOutput.ch(0) >> limiter.ch(0);
     upsampler1 >> clip1 >> downsampler1 >> clipOutput.ch(1) >> limiter.ch(1);
     
+    std::cout<< "[ substrata ] initializating samplers ";
+    
     for( int i=0; i<NUMSAMPLERS; ++i ){
-        std::cout<< "[ substrata ] initializating sampler "<<i<<"\n";
-        samplers[i].linkToLibrary( library );    
+        
+        samplers[i].linkToLibrary( library );        
+        
+        std::cout<<"."<< std::flush;
+        
         //samplers[i].rms >> engine.blackhole();
         
         if( bUseIR ){
@@ -70,6 +75,7 @@ void ofApp::setup(){
         samplers[i].ch(0) >> limiter.ch(0);
         samplers[i].ch(1) >> limiter.ch(1);
     }
+    std::cout<<"\n";
     
     if(bUseIR){
         //synths.gain.ch(0) * dB( -12.0f ) >> reverbSend.ch(0);

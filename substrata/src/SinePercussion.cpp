@@ -64,7 +64,7 @@ void np2::synth::SinePercussion::oscMapping( pdsp::osc::Input & osc, std::string
 
     osc.out_trig( address, 1 ) >> triggers;
     osc.out_trig( address, 1 ) >> aEnv.in_hold();
-    osc.out_trig( address, 1 ) >> aEnv.in_release();
+    osc.out_trig( address, 1 ) * 2.0f >> aEnv.in_release();
     osc.parser( address , 1) = [&]( float value ) noexcept {
         return 1.0f + value * pdsp::Clockable::getOneBarTimeMs() * (0.5f/16.0f);
     };

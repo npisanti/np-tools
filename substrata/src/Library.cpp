@@ -73,6 +73,7 @@ void substrata::Library::init( std::string path ){
 	}
     
     std::cout<<"\n";
+    std::cout<<"[ substrata ] loaded "<<samples.size()<<" samples\n";
 }
 
 void substrata::Library::addInstrumentFolder( std::string path, int index ){
@@ -103,7 +104,7 @@ void substrata::Library::addInstrumentFolder( std::string path, int index ){
             }
         }
     }else{
-        std::cout<<"[substrata] subfolder 0 is mandatory, error for directory "<<path<<"\n";
+        std::cout<<"[ substrata ] subfolder 0 is mandatory, error for directory "<<path<<"\n";
     }
 
 

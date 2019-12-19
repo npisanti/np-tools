@@ -150,13 +150,13 @@ void substrata::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address
     osc.out_value( address, 2 ) >> samplers[1].in_pitch();
     osc.parser( address, 2 ) = [&, table]( float value ) noexcept {
         int i = value;
-        if( i >= 24 ){
-            i -= 36;
-        }
-        float p = table->pitches[(i+12)%table->degrees];
+        float p = table->pitches[i%table->degrees];
         int o = i / table->degrees;
         p += o*12.0f;
         p -= table->base;
+        if( i >= 24 ){
+            p -= 72.0f;
+        }
         return p;  
     };       
 
