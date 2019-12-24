@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<panel>
+	<datasynth>
+		<gain>-24</gain>
+		<wave_smoothing>0.4</wave_smoothing>
+		<filter_cutoff>110</filter_cutoff>
+		<env_attack>0</env_attack>
+		<env_decay>50</env_decay>
+		<env_sustain>1</env_sustain>
+		<env_release>50</env_release>
+		<drift>0.05</drift>
+	</datasynth>
+	<chorus>
+		<cho_speed__hz_>0.25</cho_speed__hz_>
+		<cho_depth__ms_>3.5</cho_depth__ms_>
+	</chorus>
+</panel>
