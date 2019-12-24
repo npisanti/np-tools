@@ -35,6 +35,7 @@ void np::synth::FMSub::patch(){
 
     pitchNode >> carrierA.in_pitch();
     pitchNode >> carrierB.in_pitch();
+    pitchNode >> modulator.in_pitch();
     
     detune_ctrl * -1.0f >> carrierA.in_pitch();
     detune_ctrl         >> carrierB.in_pitch();
@@ -135,7 +136,7 @@ void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, 
         value *= (1.0f/16.0f);
         value = (value<1.0) ? value : 1.0;
         value = value * value;
-        value = 5 + value * 600;
+        value = 5 + value * 1000;
         return value;  
      };
         

@@ -80,8 +80,8 @@ void ofApp::setup(){
     if(bUseIR){
         //synths.gain.ch(0) * dB( -12.0f ) >> reverbSend.ch(0);
         //synths.gain.ch(1) * dB( -12.0f )  >> reverbSend.ch(1);
-        sub * dB(-30.0f) >> reverbSend.ch(0);
-        sub * dB(-30.0f) >> reverbSend.ch(1);
+        sub * dB(-27.0f) >> reverbSend.ch(0);
+        sub * dB(-27.0f) >> reverbSend.ch(1);
         zap * dB(-30.0f) >> reverbSend.ch(0);
         zap * dB(-30.0f) >> reverbSend.ch(1);
         noise.out("L") * dB(-30.0f) >> reverbSend.ch(0);
@@ -108,7 +108,7 @@ void ofApp::setup(){
     noise.out("L") >> upsampler0;
     noise.out("R") >> upsampler1;
 
-    table.tonalControl >> sub.in("modulator");
+    //table.tonalControl >> sub.in("modulator");
     
     limiter.ch(0) >> engine.audio_out(0);
     limiter.ch(1) >> engine.audio_out(1);

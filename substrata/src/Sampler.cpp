@@ -117,7 +117,7 @@ pdsp::Patchable & substrata::Sampler::ch( int i ){
 
 void substrata::Sampler::linkToLibrary( substrata::Library & library ){
     
-    std::cout<<"[substrata::Sampler] adding "<<library.samples.size()<<" samples\n";
+    //std::cout<<"[substrata::Sampler] adding "<<library.samples.size()<<" samples\n";
     
     for( size_t i=0; i<library.samples.size(); ++i ){
         samplers[0].addSample( library.samples[i], 0 );
