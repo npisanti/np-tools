@@ -128,16 +128,15 @@ void substrata::Sampler::linkToLibrary( substrata::Library & library ){
 }
 
 void substrata::Sampler::oscMapping( pdsp::osc::Input & osc, std::string address, np::tuning::ModalTable * table ){
-    
+
+    osc.out_trig( address, 0 ) >> triggers;    
     osc.parser( address , 0) = [&]( float value ) noexcept {
         subfolder = value;
-        return pdsp::osc::Ignore;
+        return 1.0f;
     };
 
     osc.out_trig( address, 1 ) >> selectNode;
-    osc.out_trig( address, 1 ) >> triggers;
     osc.parser( address , 1) = [&]( float value ) noexcept {
-        //std::cout<<"received message\n";
         instrument = value;
         if( value!=0.0f && pLibrary->availables[instrument] ){
             return pLibrary->correlate( instrument, subfolder );

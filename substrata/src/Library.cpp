@@ -35,7 +35,7 @@ float substrata::Library::correlate( int instrument, int subfolder ){
             corr.now = x;
         break;
     }
-    
+
     return float(x);
 }
     
