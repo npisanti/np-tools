@@ -80,16 +80,16 @@ void ofApp::setup(){
     if(bUseIR){
         //synths.gain.ch(0) * dB( -12.0f ) >> reverbSend.ch(0);
         //synths.gain.ch(1) * dB( -12.0f )  >> reverbSend.ch(1);
-        sub * dB(-27.0f) >> reverbSend.ch(0);
-        sub * dB(-27.0f) >> reverbSend.ch(1);
-        zap * dB(-30.0f) >> reverbSend.ch(0);
-        zap * dB(-30.0f) >> reverbSend.ch(1);
-        noise.out("L") * dB(-30.0f) >> reverbSend.ch(0);
-        noise.out("R") * dB(-30.0f) >> reverbSend.ch(1);
+        sub * dB(-30.0f) >> reverbSend.ch(0);
+        sub * dB(-30.0f) >> reverbSend.ch(1);
+        zap * dB(-36.0f) >> reverbSend.ch(0);
+        zap * dB(-36.0f) >> reverbSend.ch(1);
+        noise.out("L") * dB(-36.0f) >> reverbSend.ch(0);
+        noise.out("R") * dB(-36.0f) >> reverbSend.ch(1);
         reverbSend.ch(0) >> ireverb.cut0;
         reverbSend.ch(1) >> ireverb.cut1; 
-        ireverb.rev0 * dB(-24.0f) >> limiter.ch(0);
-        ireverb.rev1 * dB(-24.0f) >> limiter.ch(1);
+        ireverb.rev0 * dB(-36.0f) >> limiter.ch(0);
+        ireverb.rev1 * dB(-36.0f) >> limiter.ch(1);
     }else{
         //synths.gain.ch(0) >> reverbSend;
         //synths.gain.ch(1) >> reverbSend;
