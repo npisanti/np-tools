@@ -84,8 +84,11 @@ void np2::synth::NoiseDevice::oscMapping( pdsp::osc::Input & osc, std::string ad
     osc.out_trig( address, 1 ) >> env.in_release();
     osc.parser( address , 1) = [&]( float value ) noexcept {
         m2 = value;
-        bTrig = true;
-        return 5 + value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
+        value *= (1.0f/16.0f);
+        value = (value<1.0) ? value : 1.0;
+        value = value * value;
+        value = 5 + value * 500.0f;
+        return value;
     };
     
     osc.out_value( address, 2 ) * 12.0f >> modFilterAmt.in_mod();

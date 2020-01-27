@@ -65,7 +65,7 @@ public:
     pdsp::Amp           fmAmp;
     pdsp::Amp           voiceAmp;
 
-    pdsp::AHR           ampEnv;
+    pdsp::ADSR           ampEnv;
     pdsp::Parameter         envAttackControl;
     pdsp::Parameter         envReleaseControl;
 
@@ -92,6 +92,8 @@ public:
     pdsp::LinearCrossfader oscXFader;
 
     np2::effect::HQSaturator saturator;
+    
+    std::atomic<bool> gate;
 };
 
 }} // end namspaces 

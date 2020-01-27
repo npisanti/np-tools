@@ -63,14 +63,14 @@ void np2::synth::SinePercussion::oscMapping( pdsp::osc::Input & osc, std::string
     };       
 
     osc.out_trig( address, 1 ) >> triggers;
-    osc.out_trig( address, 1 ) >> aEnv.in_hold();
-    osc.out_trig( address, 1 ) * 2.0f >> aEnv.in_release();
+    osc.out_trig( address, 1 ) * 0.3333f >> aEnv.in_hold();
+    osc.out_trig( address, 1 ) * 0.6666f >> aEnv.in_release();
     osc.parser( address , 1) = [&]( float value ) noexcept {
         bTrig = true;
         value *= (1.0f/16.0f);
         value = (value<1.0) ? value : 1.0;
         value = value * value;
-        value = 5 + value * 150;
+        value = 5 + value * 500.0f;
         return value;  
     };
     
@@ -82,7 +82,7 @@ void np2::synth::SinePercussion::oscMapping( pdsp::osc::Input & osc, std::string
         value *= (1.0f/16.0f);
         value = (value<1.0) ? value : 1.0;
         value = value * value;
-        value = 5 + value * 1000;
+        value = 5 + value * 500.0f;
         return value;  
     };
 }

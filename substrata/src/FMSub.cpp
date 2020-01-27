@@ -26,7 +26,6 @@ void np::synth::FMSub::patch(){
     addModuleInput("trig", voiceTrigger);
     addModuleInput("pitch", pitchNode);
     addModuleInput("modulator", modulator.in_pitch() );
-    addModuleInput("hold", ampEnv.in_hold() );
     addModuleOutput("signal", saturator);
 
     modEnv.setReleaseCurve( 1.0f );
@@ -59,6 +58,7 @@ void np::synth::FMSub::patch(){
     voiceTrigger >> ampEnv >> voiceAmp.in_mod();
     
     envAttackControl  >> ampEnv.in_attack();
+    1.0f  >> ampEnv.in_sustain();
     envReleaseControl >> ampEnv.in_release();
     
     voiceTrigger >> modEnv;
@@ -94,13 +94,14 @@ void np::synth::FMSub::patch(){
     
     bTrig = false;
     bPitch = false;
+    gate = false;
 }
 
 void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, np::tuning::ModalTable * table ){
     
     osc.out_value( address, 0 ) >> pitchNode;
-    osc.out_value( address, 0 ) >> pitchNode;
     osc.parser( address, 0 ) = [&, table]( float value ) noexcept {
+        if( value == 33.0f ) return pdsp::osc::Ignore;
         int i = value;
         if( m1 != i ){
             bPitch = true;
@@ -110,26 +111,38 @@ void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, 
         int o = i / table->degrees;
         p += o*12.0f;
         return p;  
-    };       
+    };   
 
     osc.out_trig( address, 1 ) >> ampEnv.in_attack();
+    osc.out_trig( address, 1 ) >> ampEnv.in_release();
     osc.parser( address , 1) = [&]( float value ) noexcept {
-        bTrig = true;
         return value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
     };
-
-    osc.out_trig( address, 2 ) >> ampEnv.in_hold();
+    
     osc.out_trig( address, 2 ) >> voiceTrigger;
     osc.parser( address , 2) = [&]( float value ) noexcept {
-        return 1.0f + value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
+        if( gate && value == 33.0f ){
+            gate = false;
+            return 0.0f;
+        }else if( !gate && value!=33.0f ){
+            gate = true;
+            bTrig = true;
+            return 1.0f;
+        }else{
+            return pdsp::osc::Ignore;
+        }
     };
-    
-    osc.out_trig( address, 3 ) >> ampEnv.in_release();
+
+    osc.out_value( address, 3 ) >> modulator.in_ratio();
     osc.parser( address , 3) = [&]( float value ) noexcept {
-        return value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
+        if( value == 0.0f ){
+            return 0.5f;
+        }else{
+            return value;
+        }
     };
     
-    osc.out_value( address, 4 ) * 0.25f >> fm_mod.in_mod();
+    osc.out_value( address, 4 ) * (1.0f/16.0f) >> fm_mod.in_mod();
 
     osc.out_value( address, 5 ) >> modEnv.in_release();
     osc.parser( address , 5) = [&]( float value ) noexcept {
@@ -139,15 +152,6 @@ void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, 
         value = 5 + value * 1000;
         return value;  
      };
-        
-    osc.out_value( address, 6 ) >> modulator.in_ratio();
-    osc.parser( address , 6) = [&]( float value ) noexcept {
-        if( value == 0.0f ){
-            return 1.0f;
-        }else{
-            return value;
-        }
-    };
 }
 
 float np::synth::FMSub::meter_mod_env() const{
