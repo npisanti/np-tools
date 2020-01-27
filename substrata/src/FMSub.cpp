@@ -116,7 +116,7 @@ void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, 
     osc.out_trig( address, 1 ) >> ampEnv.in_attack();
     osc.out_trig( address, 1 ) >> ampEnv.in_release();
     osc.parser( address , 1) = [&]( float value ) noexcept {
-        return value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
+        return value * pdsp::Clockable::getOneBarTimeMs() * (0.5f/16.0f);
     };
     
     osc.out_trig( address, 2 ) >> voiceTrigger;
@@ -146,11 +146,7 @@ void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, 
 
     osc.out_value( address, 5 ) >> modEnv.in_release();
     osc.parser( address , 5) = [&]( float value ) noexcept {
-        value *= (1.0f/16.0f);
-        value = (value<1.0) ? value : 1.0;
-        value = value * value;
-        value = 5 + value * 1000;
-        return value;  
+        return value * pdsp::Clockable::getOneBarTimeMs() * (0.5f/16.0f);
      };
 }
 
