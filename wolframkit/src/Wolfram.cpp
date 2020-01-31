@@ -24,70 +24,71 @@
 np::sequence::Wolfram2::Wolfram2(){
 
     stepbars.resize( CA_WIDTH );
-    thresholds.resize( NUMSYNTHS );
-    
+
     this->steps = 16;
-    this->division = 16;
     this->density = 0.5;
     this->regenerate = true;
+
+    thresholds.resize( NUMSYNTHS );
+    numbers.resize(NUMSYNTHS);
+    for( size_t i=0; i<numbers.size(); ++i ){
+        numbers[i] = ofToString(i);
+        thresholds[i] = 0;
+    }
     
-    code = [&] () noexcept {
-        
-        if(regenerate){
-            ca.random( density );
-            regenerate = false;
-        }else{
-            ca.advance();
-        }
+    seq.code = [&] ( int frame ) noexcept {
+        if( frame%steps == 0 ){
+            if(regenerate){
+                ca.random( density );
+                regenerate = false;
+            }else{
+                ca.advance();
+            }            
 
-        for(int x=0; x < CA_WIDTH; ++x){
-            int sum = 0;
-            sum += ca.CA[0][x];
-            sum += ca.CA[1][x];
-            sum += ca.CA[2][x];
-            sum += ca.CA[3][x];
-            sum += ca.CA[4][x];
-            sum += ca.CA[5][x];
-            sum += ca.CA[6][x];
-            sum += ca.CA[7][x];
-            
-            int sect = x / steps;
-            float value = 0.0f;
-                        
-            if( sect <NUMSYNTHS ){
-                int tr = thresholds[sect];
-                sum -= tr;
-                int range = CA_HEIGHT - tr;
-       
-                if( sum>0 && range>0 ){
-                    value = float( sum ) / float ( range );
-                }              
-            }
-
-            stepbars[x] = value;
-        } 
-        
-        // seqs array to messages ---------------------------
-        this->bars = double(steps) / double(division);
-        
-        double d = division;
-        
-        this->begin();       
-            for(int s=0; s<steps; ++s){ // steps
-                for(int o=0; o < NUMSYNTHS; ++o) { // outputs
-                    float outval = stepbars[ (o*steps) + s ];
-                    if ( outval > 0.0f ){
-                        this->delay( s / d ).out( o ).bang( outval );
-                    }
+            for(int x=0; x < CA_WIDTH; ++x){
+                int sum = 0;
+                sum += ca.CA[0][x];
+                sum += ca.CA[1][x];
+                sum += ca.CA[2][x];
+                sum += ca.CA[3][x];
+                sum += ca.CA[4][x];
+                sum += ca.CA[5][x];
+                sum += ca.CA[6][x];
+                sum += ca.CA[7][x];
+                
+                int sect = x / steps;
+                float value = 0.0f;
+                            
+                if( sect <NUMSYNTHS ){
+                    int tr = thresholds[sect];
+                    sum -= tr;
+                    int range = CA_HEIGHT - tr;
+           
+                    if( sum>0 && range>0 ){
+                        value = float( sum ) / float ( range );
+                    }              
                 }
-            }
-        this->end();
-    };    
+
+                stepbars[x] = value;
+            }             
+        }
     
+        int s = frame % steps;
+        meter_step = s;
+        
+        for(int o=0; o < NUMSYNTHS; ++o) { 
+            float outval = stepbars[ (o*steps) + s ];
+            seq.send( numbers[o], outval );
+        }
+    };    
+}
+
+pdsp::SequencerGateOutput& np::sequence::Wolfram2::out_trig( int index ){
+    return seq.out_trig( numbers[index] );
 }
 
 int np::sequence::Wolfram2::currentStep() const {
-    return meter_percent() * steps;
+    return meter_step;
 }
 
 float np::sequence::Wolfram2::getStep( int step, int out ) const{
@@ -109,14 +110,12 @@ void np::sequence::Wolfram2::draw( int ca_side, int bars_h, ofColor fg, ofColor 
         }
     }
 
-    int playhead = meter_percent() * steps; 
-
     ofPushMatrix();
     ofTranslate( 0, ca_side * (CA_HEIGHT+1));
     
     ofSetColor( bg );
     for( int x=0; x<CA_WIDTH; ++x ){
-        if( x%steps == playhead ){
+        if( x%steps == meter_step ){
             ofSetColor( fg );
         }else{
             ofSetColor( bg );

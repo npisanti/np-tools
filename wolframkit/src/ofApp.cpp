@@ -44,43 +44,10 @@ void ofApp::setup(){
         //darkColor = ofColor( 90, 35, 35);
     }
 
-    ruleseq.setup( seqPath );
-
+ 
     //----------------- SEQUENCING ---------------------
     engine.score.setTempo(172.0f);
-    engine.score.sections.resize(2);
-    
-    engine.score.sections[0].setCell( 0, &masterplan );
-    
-    // masterplan coding
-    masterplan.bars = 1.0;
-    
-    masterplan.code = [&] () {
-        if( ruleseq.changed() ){
-            masterplan.resetCount();
-            wolframSeq.division = ruleseq.division();
-            engine.sequencer.setTempo( ruleseq.tempo() );
-        }
-        
-        if( masterplan.counter() % ruleseq.numBars() == 0 ){
-            
-            for( int i=0; i<NUMSYNTHS; ++i ){
-                wolframSeq.thresholds[i] = ruleseq.entry().thresholds[i];                                
-            }
-
-            wolframSeq.setRule( ruleseq.entry().rule );
-            wolframSeq.density = ruleseq.entry().density;
-            wolframSeq.regenerate = true;
-            
-            ruleseq.next();
-        }
-
-    }; // masterplan end
-
-
-    engine.score.sections[1].setCell( 0, &wolframSeq );
-    engine.score.launchMultipleCells(0); 
-    
+ 
     
     // ----------- PATCHING -----------
     
@@ -88,7 +55,8 @@ void ofApp::setup(){
     
     for ( int i=0; i<NUMSYNTHS; ++i ) {
         percs[i].setPitch( 36.0f + i*7.0f );
-        engine.score.sections[1].out_trig(i) >> percs[i]; // patch the sequence outputs to the percs
+        wolfram.out_trig(i) >> percs[i]; 
+        
         percs[i].out("L") >> limiter.ch(0);
         percs[i].out("R") >> limiter.ch(1);
     
@@ -129,20 +97,10 @@ void ofApp::setup(){
 void ofApp::update(){
     // sends out OSC 
     if( outputPort!=-1 ){
-        float playhead = wolframSeq.meter_percent();
-        int coarse = playhead * PLAYHEAD_GRANULARITY;
-        if( coarse != lastplayhead ){
-            ofxOscMessage m;
-            m.setAddress("/wolfram/playhead");
-            m.addFloatArg( playhead ); 
-            sender.sendMessage(m, false);
-            lastplayhead = coarse;
-        }
-        
-        int step = wolframSeq.currentStep();
+        int step = wolfram.currentStep();
         if( step!= laststep ){
             for( int i=0; i<NUMSYNTHS; ++i){
-                float value = wolframSeq.getStep( step, i );
+                float value = wolfram.getStep( step, i );
                 ofxOscMessage m;
                 m.setAddress("/wolfram");
                 m.addIntArg( i ); // instrument
@@ -163,7 +121,7 @@ void ofApp::draw(){
         int off = (ofGetWidth() - w)/2;
         
         ofTranslate( off, 30 );
-        wolframSeq.draw( side, 50, brightColor, darkColor );
+        wolfram.draw( side, 50, brightColor, darkColor );
     }
 }
 

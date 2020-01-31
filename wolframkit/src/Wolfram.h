@@ -27,29 +27,32 @@
 #include "Automaton1D.h"
 
 namespace np { namespace sequence {
-
+    
 class Wolfram2 : public pdsp::Sequence {
 
 public:
     Wolfram2();
 
-    void draw( int ca_side, int bars_h, ofColor fg, ofColor bg );
-    void setRule(int rule){ ca.setRule( rule); }
-    
-    int currentStep() const;
-    float getStep( int step, int out ) const;
-
     std::vector<int> thresholds;
-
     std::atomic<int>   steps;
-    std::atomic<int>   division;
     std::atomic<float> density;
     std::atomic<bool>  regenerate;
     
-    vector<float>   stepbars;    
+    void draw( int ca_side, int bars_h, ofColor fg, ofColor bg );
+    void setRule(int rule){ ca.setRule( rule); }
+    int currentStep() const;
+    float getStep( int step, int out ) const;
 
+    pdsp::SequencerGateOutput& out_trig( int index );
+    
+    vector<float>   stepbars;    
+    
 private:
+    pdsp::Function seq;
+    std::vector<std::string> numbers;
     Automaton1D     ca;
+    
+    std::atomic<int> meter_step;
 
 };
 

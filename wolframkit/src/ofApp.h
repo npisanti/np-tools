@@ -57,10 +57,9 @@ class ofApp : public ofBaseApp{
 
         // pdsp modules
         pdsp::Engine   engine; 
-        
-        pdsp::Sequence masterplan;        
+           
         np::RuleSeq ruleseq;
-        np::sequence::Wolfram2 wolframSeq;
+        np::sequence::Wolfram2 wolfram;
 
         np::effect::StereoDelay dub;
         np::effect::BasiVerb reverb;

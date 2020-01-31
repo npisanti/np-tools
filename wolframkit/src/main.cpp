@@ -85,11 +85,11 @@ int main( int argc, char *argv[] ){
         
         if( app->synthPath=="" ){
             std::cout<< "[ wolframkit ] no synths path given! \n";
-            return 0;
+            //return 0;
         }
         if( app->seqPath=="" ){
             std::cout<< "[ wolframkit ] no sequences path given! \n";
-            return 0;
+            //return 0;
         }
         
         ofAppNoWindow window; 
