@@ -133,16 +133,16 @@ void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, 
         }
     };
 
-    osc.out_value( address, 3 ) >> modulator.in_ratio();
+    osc.out_value( address, 3 ) * 0.5f >> modulator.in_ratio();
     osc.parser( address , 3) = [&]( float value ) noexcept {
         if( value == 0.0f ){
-            return 0.5f;
+            return 0.25f;
         }else{
             return value;
         }
     };
     
-    osc.out_value( address, 4 ) * (1.0f/16.0f) >> fm_mod.in_mod();
+    osc.out_value( address, 4 ) * (1.0f/8.0f) >> fm_mod.in_mod();
 
     osc.out_value( address, 5 ) >> modEnv.in_release();
     osc.parser( address , 5) = [&]( float value ) noexcept {
