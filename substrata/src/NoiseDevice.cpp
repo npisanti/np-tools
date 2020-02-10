@@ -71,6 +71,8 @@ void np2::synth::NoiseDevice::oscMapping( pdsp::osc::Input & osc, std::string ad
     -60.0f >> noise.in_pitch();
     osc.out_value( address, 0 ) >> noise.in_pitch();
     osc.out_value( address, 0 ) >> noise.in_pitch();
+    osc.out_value( address, 0 ) >> noise.in_decimation();
+    
     osc.parser( address, 0 ) = [&, table]( float value ) noexcept {
         int i = value;
         m1 = i;
@@ -97,7 +99,7 @@ void np2::synth::NoiseDevice::oscMapping( pdsp::osc::Input & osc, std::string ad
     
     osc.out_value( address, 3 ) * 12.0f >> noise.in_pitch();
     
-    osc.out_value( address, 4 ) * (-6.0f) >> noise.in_decimation();
+    osc.out_value( address, 4 ) * (-12.0f) >> noise.in_decimation();
     
 }
 
