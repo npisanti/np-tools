@@ -39,7 +39,6 @@ void ofApp::setup(){
     }
     
     library.init( path ) ;
-    table.setup( "pitch_table" );
     
     bool bUseIR = ireverb.load( path + "/IR" );
     
@@ -117,11 +116,13 @@ void ofApp::setup(){
 
     // OSC mapping -----------------------------
     osc.linkTempo( "/orca/bpm" );
-
+    
+    table.oscMapping( osc );
+    
     sub.oscMapping( osc, "/s", &table );
     zap.oscMapping( osc, "/z", &table );
     noise.oscMapping( osc, "/x", &table );
-    
+
     synths.oscMapping( osc, &table );
     
     for(size_t i=0; i<NUMSAMPLERS; ++i ){
@@ -151,7 +152,6 @@ void ofApp::setup(){
         
         parameters.add( limiter.parameters );
         parameters.add( reverb.parameters );
-        parameters.add( table.parameters );
         parameters.add( sub.parameters );
         parameters.add( zap.parameters );
         parameters.add( noise.parameters );

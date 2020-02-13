@@ -54,7 +54,7 @@ void np2::synth::WaveSynth::setup( std::string path ){
     
     lowcutControl >> lowcut.in_freq();
     
-    voices.resize( 6 );
+    voices.resize( 8 );
     
     for( size_t i=0; i<voices.size(); ++i ){
         voices[i].setup( *this );
@@ -77,12 +77,14 @@ void np2::synth::WaveSynth::oscMapping( pdsp::osc::Input & osc, np::tuning::Moda
     for( size_t i=0; i<voices.size(); ++i ){
         std::string address;
         switch( i ){
-            case 0: address = "/q"; break;
-            case 1: address = "/w"; break;
-            case 2: address = "/e"; break;
-            case 3: address = "/r"; break;
-            case 4: address = "/t"; break;
-            case 5: address = "/y"; break;
+            case 0: address = "/h"; break;
+            case 1: address = "/i"; break;
+            case 2: address = "/j"; break;
+            case 3: address = "/k"; break;
+            case 4: address = "/l"; break;
+            case 5: address = "/m"; break;
+            case 6: address = "/n"; break;
+            case 7: address = "/o"; break;
             
             default: address = "/boh"; break;
         }

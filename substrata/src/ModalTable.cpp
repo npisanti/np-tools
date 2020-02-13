@@ -21,64 +21,43 @@
 
 #include "ModalTable.h"
 
-#define MAX_DEGREES 12
-
-ofParameterGroup & np::tuning::ModalTable::setup( std::string name ) {
-    
-    ratios.resize( MAX_DEGREES );
-    pitches.resize( MAX_DEGREES );
-    
-    parameters.setName( name );
-    parameters.add( masterPitchControl.set( "master_pitch",  29,   0,    60  ) );
-    parameters.add( degrees.set( "used_degrees",  12,   3,    12  ) );
-
-    int index = 0;
-
-    for( RatioUI & r : ratios ){
-        r.setBasePitch( masterPitchControl );  
-        std::string label = "d";
-        label += ofToString(index);
-        label += " numerator";
-        parameters.add( r.numerator.set( label, MAX_DEGREES + index, 1, 63 ) );
-        label = "d";
-        label += ofToString(index);
-        label += " denominator";
-        parameters.add( r.denominator.set( label, MAX_DEGREES, 1, 32 ) );
-        
-        r.numerator.addListener( this, &ModalTable::updateAll );
-        r.denominator.addListener( this, &ModalTable::updateAll);
-
-        index++;
+np::tuning::ModalTable::ModalTable(){
+    degrees = TABLE_DEGREES;
+   
+    for( int i=0; i<TABLE_DEGREES; ++i ){
+        ratios[i].numerator = i + 12;
+        ratios[i].denominator = 12;
     }
-    
-    masterPitchControl.addListener( this, &ModalTable::updateAll);
-    
-    deg = degrees;
-    base = masterPitchControl;
-    
-    tonalControl.set( masterPitchControl );
-    
-    int dummy = 0;
-    updateAll( dummy );
-    
-    return parameters;
+    base = 29;
+    recalculate();
 }
-
-ofParameterGroup & np::tuning::ModalTable::label( std::string name ){
-    parameters.setName(name);
-    return parameters;
-}
-
-void np::tuning::ModalTable::updateAll( int & value ) {
-    int dummy = 0;
-    for( RatioUI & r : ratios ){
-        r.ratioChange( dummy );
-    } 
-    for( size_t i=0; i<pitches.size(); ++i){
-        pitches[i] = ratios[i].pitch;
+    
+void np::tuning::ModalTable::recalculate(){
+    for( int i=0; i<TABLE_DEGREES; ++i ){
+        double ratio = double(ratios[i].numerator) / double (ratios[i].denominator);
+        double bp = double( base );
+        double freq = pdsp::p2f( bp );
+        freq *= ratio;
+        pitches[i] = pdsp::f2p(freq);
     }
-    base = masterPitchControl;
-    deg = degrees;
-    
-    tonalControl.set( masterPitchControl );
 }
+
+void np::tuning::ModalTable::oscMapping( pdsp::osc::Input & osc ){
+    for( int index=0; index<TABLE_DEGREES; ++index ){
+        osc.parser( "/t", index*2 ) = [&, index]( float value ) noexcept {
+            ratios[index].numerator = value;
+            return pdsp::osc::Ignore;
+        };
+        osc.parser( "/t", index*2 +1 ) = [&, index]( float value ) noexcept {
+            ratios[index].denominator = value;
+            return pdsp::osc::Ignore;
+        };
+    }
+    osc.parser( "/t", TABLE_DEGREES*2 ) = [&]( float value ) noexcept {
+        std::cout<<"recalculating!!!\n";
+        base = 24+value;
+        recalculate();
+        return pdsp::osc::Ignore;
+    };
+}
+    

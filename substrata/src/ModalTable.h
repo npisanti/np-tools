@@ -26,63 +26,31 @@
 
 // pure tuning using integer ratios
 
+#define TABLE_DEGREES 6
+
 namespace np { namespace tuning {
 
 class ModalTable {
 
 private:
-
     // private internal classes ------------------------------------------------
-    struct RatioUI {
-
-        RatioUI(){
-            numerator.addListener(this, &RatioUI::ratioChange);
-            denominator.addListener(this, &RatioUI::ratioChange);
-        }
-
-        void ratioChange( int & value ) {
-            double ratio = double(numerator) / double (denominator);
-            double bp = (double) (*basePitch);
-            double freq = pdsp::p2f(bp);
-            freq *= ratio;
-            pitch = pdsp::f2p(freq);
-        }
-        
-        void setBasePitch( ofParameter<int> & bp) {
-            basePitch = &bp;
-        }
-        
-        ofParameter<int>*   basePitch;
-        ofParameter<int>    numerator;
-        ofParameter<int>    denominator;
-        
-        float pitch;
+    struct Ratio {
+        std::atomic<int> numerator;
+        std::atomic<int> denominator;
     };
 
 public: // ------------------- PUBLIC API ----------------------------
-
-    ModalTable(){}
-    ModalTable( const ModalTable & other ) { }
+    ModalTable();
     
-    ofParameterGroup & setup( std::string name="integer ratio mode" );
-    ofParameterGroup & label( std::string name );  
-    
-    ofParameterGroup parameters;    
-        std::vector<float> pitches;
-        ofParameter<int> degrees;
-    
-    std::atomic<int> deg;
     std::atomic<int> base;
+    std::atomic<int> degrees;
     
-    pdsp::ValueControl tonalControl;
+    float pitches [TABLE_DEGREES];
+    Ratio  ratios [TABLE_DEGREES];
+        
+    void recalculate();
     
-private: // ----------------------------------------------------------
-
-    void updateAll( int & value );
-    
-    ofParameter<int>    masterPitchControl;
-    vector<RatioUI>     ratios;
-
+    void oscMapping( pdsp::osc::Input & osc );
     
 };
 
