@@ -54,7 +54,7 @@ void np2::synth::WaveSynth::setup( std::string path ){
     
     lowcutControl >> lowcut.in_freq();
     
-    voices.resize( 9 );
+    voices.resize( 6 );
     
     for( size_t i=0; i<voices.size(); ++i ){
         voices[i].setup( *this );
@@ -72,9 +72,21 @@ void np2::synth::WaveSynth::setup( std::string path ){
 }
 
 void np2::synth::WaveSynth::oscMapping( pdsp::osc::Input & osc, np::tuning::ModalTable * table ){
+    
+    
     for( size_t i=0; i<voices.size(); ++i ){
-        std::string address = "/";
-        address += ofToString( i+1 );
+        std::string address;
+        switch( i ){
+            case 0: address = "/q"; break;
+            case 1: address = "/w"; break;
+            case 2: address = "/e"; break;
+            case 3: address = "/r"; break;
+            case 4: address = "/t"; break;
+            case 5: address = "/y"; break;
+            
+            default: address = "/boh"; break;
+        }
+        
         voices[i].oscMapping( osc, address, table );
     }
 }
@@ -136,15 +148,9 @@ void np2::synth::WaveSynth::Voice::setup(WaveSynth & m){
 }
 
 void np2::synth::WaveSynth::Voice::oscMapping( pdsp::osc::Input & osc, std::string address, np::tuning::ModalTable * table ){
-    
-    osc.out_value( address, 0 ) >> oscillator.in_table();
-    osc.parser( address, 0 ) = [&, table]( float value ) noexcept {
-        m2 = value;
-        return value;
-    };      
        
-    osc.out_value( address, 1 ) >> oscillator.in_pitch();
-    osc.parser( address, 1 ) = [&, table]( float value ) noexcept {
+    osc.out_value( address, 0 ) >> oscillator.in_pitch();
+    osc.parser( address, 0 ) = [&, table]( float value ) noexcept {
         int i = value;
         m1 = i;
         bTrig = true;
@@ -154,25 +160,30 @@ void np2::synth::WaveSynth::Voice::oscMapping( pdsp::osc::Input & osc, std::stri
         return p;
     };       
 
-    osc.out_trig( address, 2 ) >> envelope.in_trig();
-    osc.out_trig( address, 2 ) >> envelope.in_attack();
-    osc.parser( address , 2) = [&]( float value ) noexcept {
-        return 1.0f + value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
-    };
-    
-    osc.out_trig( address, 3 ) >> envelope.in_release();
-    osc.parser( address , 3) = [&]( float value ) noexcept {
-        return 5.0f + value * pdsp::Clockable::getOneBarTimeMs() * (2.0f/16.0f);
-    };
-    
-    osc.out_value( address, 4 ) * 12.0f >> envToFilter.in_mod();
-    osc.parser( address, 4 ) = [&, table]( float value ) noexcept {
+    osc.out_value( address, 1 ) >> oscillator.in_table();
+    osc.parser( address, 1 ) = [&, table]( float value ) noexcept {
+        m2 = value;
+        return value;
+    };      
+
+    osc.out_value( address, 2 ) * 12.0f >> filter.in_pitch();
+        
+    osc.out_value( address, 3 ) * 12.0f >> envToFilter.in_mod();
+    osc.parser( address, 3 ) = [&, table]( float value ) noexcept {
         m3 = value;
         return value;
     };      
     
-    osc.out_value( address, 5 ) >> envToTable.in_mod();
+
+    osc.out_trig( address, 4 ) >> envelope.in_trig();
+    osc.out_trig( address, 4 ) >> envelope.in_attack();
+    osc.parser( address , 4) = [&]( float value ) noexcept {
+        return 1.0f + value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
+    };
     
-    osc.out_value( address, 6 ) * 12.0f >> filter.in_pitch();
-    
+    osc.out_trig( address, 5 ) >> envelope.in_release();
+    osc.parser( address , 5) = [&]( float value ) noexcept {
+        return 5.0f + value * pdsp::Clockable::getOneBarTimeMs() * (2.0f/16.0f);
+    };
+
 }
