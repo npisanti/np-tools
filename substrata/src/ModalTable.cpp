@@ -54,7 +54,6 @@ void np::tuning::ModalTable::oscMapping( pdsp::osc::Input & osc ){
         };
     }
     osc.parser( "/t", TABLE_DEGREES*2 ) = [&]( float value ) noexcept {
-        std::cout<<"recalculating!!!\n";
         base = 24+value;
         recalculate();
         return pdsp::osc::Ignore;

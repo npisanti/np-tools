@@ -79,8 +79,9 @@ public:
     pdsp::TriggeredRandom   rnd;
     pdsp::OnePole           randomSlew;
     
-    pdsp::Parameter         highcutControl;
+    //pdsp::Parameter         highcutControl;
     pdsp::HighCut           highcut;
+    pdsp::PitchToFreq       highcutControl;
 
     pdsp::Amp  fm_mod;
 

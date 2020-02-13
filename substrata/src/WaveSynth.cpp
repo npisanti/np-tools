@@ -58,9 +58,9 @@ void np2::synth::WaveSynth::setup( std::string path ){
     
     for( size_t i=0; i<voices.size(); ++i ){
         voices[i].setup( *this );
-        float pan = -1.0 + 0.25f*i;
-        voices[i] * (pdsp::panL( pan ) * dB(-6.0f) ) >> lowcut.ch(0);
-        voices[i] * (pdsp::panR( pan ) * dB(-6.0f) ) >> lowcut.ch(1);
+        
+        voices[i].pan.out_L() >> lowcut.ch(0);
+        voices[i].pan.out_R() >> lowcut.ch(1);
     }
     
     parameters.setName( "wavetable_synths" );
@@ -88,7 +88,6 @@ void np2::synth::WaveSynth::oscMapping( pdsp::osc::Input & osc, np::tuning::Moda
             
             default: address = "/boh"; break;
         }
-        
         voices[i].oscMapping( osc, address, table );
     }
 }
@@ -118,7 +117,7 @@ void np2::synth::WaveSynth::Voice::setup(WaveSynth & m){
 
     bTrig = false;
     envelope.set( 0.0f, 0.0f, 0.0f );
-    envelope.setCurve( 1.0f ); 
+    envelope.setReleaseCurve( 0.5f ); 
 
     addModuleInput("trig", envelope.in_trig());
     addModuleInput("pitch", oscillator.in_pitch());
@@ -129,7 +128,7 @@ void np2::synth::WaveSynth::Voice::setup(WaveSynth & m){
     oscillator.setTable( m.wt );
 
     // SIGNAL PATH
-    oscillator >> filter >> voiceAmp;
+    oscillator >> filter >> voiceAmp >> pan;
     
     // MODULATIONS AND CONTROL
     envelope >> envToTable >> oscillator.in_table();
@@ -181,11 +180,41 @@ void np2::synth::WaveSynth::Voice::oscMapping( pdsp::osc::Input & osc, std::stri
     osc.out_trig( address, 4 ) >> envelope.in_attack();
     osc.parser( address , 4) = [&]( float value ) noexcept {
         return 1.0f + value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
+        /*
+        value *= (1.0f/16.0f);
+        value = (value<1.0) ? value : 1.0;
+        value = value * value;
+        value = value * 1000.0f;
+        return value; 
+        */ 
     };
     
     osc.out_trig( address, 5 ) >> envelope.in_release();
     osc.parser( address , 5) = [&]( float value ) noexcept {
-        return 5.0f + value * pdsp::Clockable::getOneBarTimeMs() * (2.0f/16.0f);
+        return 5.0f + value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
+        /*
+        value *= (1.0f/16.0f);
+        value = (value<1.0) ? value : 1.0;
+        value = value * value;
+        value = 5 + value * 3000.0f;
+        return value;  
+        */
     };
 
+    osc.out_value( address, 6 ) >> pan.in_pan();
+    osc.parser(address, 6) = [&]( float value ) noexcept {
+        int pan = value;
+        if( pan > 9 ) pan = 9;
+        switch( pan ){
+            default: case 0: case 5: return 0.0f; break;
+            case 1: return -1.0f; break;
+            case 2: return -0.75f; break;
+            case 3: return -0.5f; break;
+            case 4: return -0.25f; break;
+            case 6: return 0.25f; break;
+            case 7: return 0.5f; break;
+            case 8: return 0.75f; break;
+            case 9: return 1.0f; break;
+        }
+    };     
 }

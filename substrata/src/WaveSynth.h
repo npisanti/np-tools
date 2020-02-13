@@ -45,6 +45,8 @@ public:
         pdsp::LFOPhazor         phazorFree;
         pdsp::TriggeredRandom   rnd;
         pdsp::OnePole           randomSlew;
+        
+        pdsp::Panner            pan;
     }; // end voice class -----------------------------
 
 

@@ -90,8 +90,7 @@ void np::synth::FMSub::patch(){
     parameters.add( modEnvHoldControl.set( "mod hold",  40, 0, 300 ) );
     parameters.add( modEnvReleaseControl.set("mod release", 50, 5, 600 ) );    
     parameters.add( saturator.parameters );
-    parameters.add( highcutControl.set("high_cut", 200, 20, 20000) );
-    
+
     bTrig = false;
     bPitch = false;
     gate = false;
@@ -148,6 +147,9 @@ void np::synth::FMSub::oscMapping( pdsp::osc::Input & osc, std::string address, 
     osc.parser( address , 5) = [&]( float value ) noexcept {
         return value * pdsp::Clockable::getOneBarTimeMs() * (0.5f/16.0f);
      };
+    
+    48.0f >> highcutControl;
+    osc.out_value( address, 6 ) >> highcutControl;
 }
 
 float np::synth::FMSub::meter_mod_env() const{
