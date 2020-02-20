@@ -24,7 +24,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofSetLogLevel(OF_LOG_VERBOSE);
-    input.load("/home/nicola/resources/motore/sources/cut4.png");
+    input.load( ofToDataPath("input.jpg") );
     
     gui.setup("", "settings.xml", 1400, 20);
     gui.add( cutSide.set("cut side", 40, 0, 300));

@@ -78,7 +78,7 @@ void ofApp::setup(){
     
     if(bUseIR){
         synths.gain.ch(0) * dB( -12.0f ) >> reverbSend.ch(0);
-        synths.gain.ch(1) * dB( -12.0f )  >> reverbSend.ch(1);
+        synths.gain.ch(1) * dB( -12.0f ) >> reverbSend.ch(1);
         sub * dB(-30.0f) >> reverbSend.ch(0);
         sub * dB(-30.0f) >> reverbSend.ch(1);
         zap * dB(-36.0f) >> reverbSend.ch(0);
@@ -161,8 +161,6 @@ void ofApp::setup(){
     live.watch( parameters, path + "/settings.json");
 
     // audio setup----------------------------
-    engine.sequencer.play();
-    engine.addOscInput ( osc );
 
     engine.setDeviceID( device ); 
     engine.setup( 44100, 512, 2);    
