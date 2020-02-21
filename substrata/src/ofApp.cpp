@@ -71,8 +71,8 @@ void ofApp::setup(){
         }else{
             samplers[i].out("signal") >> reverbSend;
         }
-        samplers[i].ch(0) >> limiter.ch(0);
-        samplers[i].ch(1) >> limiter.ch(1);
+        samplers[i].ch(0) >> samplersBus.ch(0) >> limiter.ch(0);
+        samplers[i].ch(1) >> samplersBus.ch(1) >> limiter.ch(1);
     }
     std::cout<<"\n";
     
@@ -156,6 +156,7 @@ void ofApp::setup(){
         parameters.add( zap.parameters );
         parameters.add( noise.parameters );
         parameters.add( synths.parameters );
+        parameters.add( samplersBus.label("samplers_bus") );
 
         
     live.watch( parameters, path + "/settings.json");

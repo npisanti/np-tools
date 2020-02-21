@@ -33,6 +33,7 @@
 #include "meter/RMS.h"
 #include "dynamics/Brickwall.h"
 #include "dynamics/SoftClip.h"
+#include "dynamics/StereoSoftClip.h"
 
 #include "ModalTable.h"
 #include "Library.h"
@@ -107,6 +108,8 @@ class ofApp : public ofBaseApp{
         pdsp::Parameter gainControl;
    
         np::dynamics::Brickwall limiter;
+        
+        np::dynamics::StereoSoftClip samplersBus;
         
         bool bDrawGui;
         
