@@ -58,15 +58,15 @@ void ofApp::setup(){
     gui.add( invertfrag.parameters  );
     gui.add( borderfrag.parameters  );
     gui.add( eSide.set("eraser side", 20, 0,50 )  );
-    gui.add( cutx.set("cut x", 700, 0, CAMW ));
-    gui.add( cuty.set("cut y", 160, 0, CAMH ));
+    gui.add( cx.set("center x", CAMW/2, 0, CAMW ));
+    gui.add( cy.set("center y", CAMH/2, 0, CAMH ));
     gui.add( cutw.set("cut width", 200, 0, 640 ) );
     gui.add( cuth.set("cut height", 200, 0, 640 ) );
     gui.add( offsetX.set("offset x", 0, -CUTMARGIN, CUTMARGIN) );
     gui.add( offsetY.set("offset y", 0, -CUTMARGIN, CUTMARGIN) );
     gui.add( speed.set("speed", 0.3f, 0.0f, 0.5f ) );
     gui.add( pMode.set("preview mode", 2, 0, 2 ) );
-    gui.add( cMode.set("crosshair mode", 0, 0, 1 ) );
+    gui.add( cMode.set("crosshair mode", 0, 0, 2 ) );
     gui.loadFromFile( "settings.xml" );
     
     reallocate();
@@ -75,10 +75,15 @@ void ofApp::setup(){
     
     cursor = 0.0f;
     cutoverlay = 0;
+    
+    alt = ofColor( 255, 0, 0 );
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+ 
+    cutx = cx - cutw/2;
+    cuty = cy - cuth/2;
  
     cam.update();
 
@@ -101,9 +106,8 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-
+    
     ofSetColor( 255 );
-   ofColor alt = ofColor( 255, 0, 0 );
 
     if( !bCleaning ){ // -------- draws acquisition UI -----
         fbo.draw( 0, 0 );
@@ -142,34 +146,9 @@ void ofApp::draw(){
  
         ofNoFill();    
         
-        switch( cMode ){
-            case 0:
-                ofSetColor( alt );
-                ofDrawLine( cutx, cuty+(cuth/2), cutx+cutw, cuty+(cuth/2) );
-                ofDrawLine( cutx+(cutw/2), cuty, cutx+(cutw/2), cuty+cuth );
-                ofDrawRectangle( cutx, cuty, cutw, cuth );        
-            break;
-            
-            case 1:
-            {
-                ofPushMatrix();
-                ofNoFill();
-                int cx = cutx + cutw/2;
-                int cy = cuty + cuth/2;
-                int rad = cutw * 0.3;
-                static const float step = TWO_PI / 3.0f;
-                ofSetColor( alt );
-                    ofTranslate( cx, cy );
-                    for( int i=0; i<3; ++i ){
-                        int x = cos( float(i) * step + PI*0.5) * rad;
-                        int y = sin( float(i) * step + PI*0.5) * rad;
-                        ofDrawCircle( x, y, 4 );
-                    }
-                ofPopMatrix();
-                ofDrawRectangle( cutx, cuty, cutw, cuth );   
-            }
-            break;
-        }
+        draw_crosshair( cutx, cuty );
+        
+
                 
     }else{ // -------- draws cleaning UI -------
         
@@ -233,14 +212,11 @@ void ofApp::draw(){
     }
     
     
-    // --------- draw frames --------------
-    
     ofEnableBlendMode(OF_BLENDMODE_ALPHA);
     
-    ofSetColor( alt );
-    ofDrawRectangle( 0, 0, cutw, cuth );
-    ofDrawLine( 0, cuth/2, cutw, cuth/2 );
-    ofDrawLine( cutw/2, 0, cutw/2, cuth );
+    draw_crosshair( 0, 0 );
+    
+    // --------- draw frames --------------
     
     ofTranslate( 0, cuth+20 );
     ofSetColor(255);
@@ -260,6 +236,54 @@ void ofApp::draw(){
     ofDrawRectangle( 0, 0, cutw, cuth );
 }
 
+void ofApp::draw_crosshair( int x, int y ){
+    
+    ofSetColor( alt );
+    ofNoFill();
+    
+    switch( cMode ){
+        case 0:
+            ofDrawLine( x, y+(cuth/2), x+cutw, y+(cuth/2) );
+            ofDrawLine( x+(cutw/2), y, x+(cutw/2), y+cuth );
+            ofDrawRectangle( x, y, cutw, cuth );        
+        break;
+        
+        case 1:
+        {
+            ofPushMatrix();
+            int cx = x + cutw/2;
+            int cy = y + cuth/2;
+            int rad = cutw * 0.3;
+            static const float step = TWO_PI / 3.0f;
+                ofTranslate( cx, cy );
+                for( int i=0; i<3; ++i ){
+                    int x = cos( float(i) * step + PI*0.5) * rad;
+                    int y = sin( float(i) * step + PI*0.5) * rad;
+                    ofDrawCircle( x, y, 4 );
+                }
+            ofPopMatrix(); 
+        }
+        break;
+        
+        case 2:
+        {
+            int xx, yy;
+            yy = y + cuth*0.333333;
+            ofDrawLine( x, yy, x+cutw, yy );
+            yy = y + cuth*0.666666;
+            ofDrawLine( x, yy, x+cutw, yy );
+            xx = x + cutw*0.333333;
+            ofDrawLine( xx, y, xx, y+cuth );
+            xx = x + cutw*0.666666;
+            ofDrawLine( xx, y, xx, y+cuth );
+        }
+        break;
+    }
+    ofDrawRectangle( x, y, cutw, cuth );  
+    
+}    
+    
+    
 void ofApp::offcut(){
     ofDisableAlphaBlending();
     cutfbo.begin();

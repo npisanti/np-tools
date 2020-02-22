@@ -46,6 +46,8 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
         
+        void draw_crosshair( int x, int y );
+        
         void reallocate();
         void erase( int mx, int my );
         void loadFrames();
@@ -64,13 +66,14 @@ class ofApp : public ofBaseApp{
         ofParameter<float> iHigh;
         ofParameter<float> iBorder;
         
-        
+        ofColor alt;
+
         ofx::dotfrag::Live borderfrag;
         
         ofxPanel gui;
         
-        ofParameter<int> cutx;
-        ofParameter<int> cuty;
+        ofParameter<int> cx;
+        ofParameter<int> cy;
         ofParameter<int> cutw;
         ofParameter<int> cuth;
         ofParameter<int> offsetX;
@@ -78,6 +81,8 @@ class ofApp : public ofBaseApp{
         ofParameter<float> speed;
         ofParameter<int> pMode;
         ofParameter<int> cMode;
+        
+        int cutx, cuty;
         
         void offcut();
         

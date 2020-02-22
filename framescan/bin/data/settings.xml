@@ -37,4 +37,6 @@
 		<u_border>0.1</u_border>
 	</border_frag>
 	<eraser_side>20</eraser_side>
+	<center_x>716</center_x>
+	<center_y>334</center_y>
 </GUI>
