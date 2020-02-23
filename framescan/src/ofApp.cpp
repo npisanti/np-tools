@@ -43,18 +43,20 @@ void ofApp::setup(){
     fbo.allocate( cam.getWidth(), cam.getHeight() );
   
     invertfrag.name( "invert cut" );
-    invertfrag.uniform( iLow.set("u_low", 0.5f, 0.0f, 1.0f) );
-    invertfrag.uniform( iHigh.set("u_high", 1.0f, 0.0f, 1.0f) );
+    invertfrag.uniform( u_low.set("u_low", 0.5f, 0.0f, 1.0f) );
+    invertfrag.uniform( u_high.set("u_high", 1.0f, 0.0f, 1.0f) );
     invertfrag.load( ofToDataPath("invertcut.frag") );
     
+    custom.name( "custom frag" );
+    custom.load( ofToDataPath("custom.frag") );
+    
     borderfrag.name( "border" );
-    borderfrag.uniform( iBorder.set("u_border", 0.05f, 0.0f, 0.4f) );
+    borderfrag.uniform( u_border.set("u_border", 0.05f, 0.0f, 0.4f) );
     borderfrag.load( ofToDataPath("border.frag") );
 
     gui.setup( "GUI", "settings.xml", ofGetWidth()-220, 20 );
     gui.add( mirror.parameters );
-    gui.add( mono.parameters );
-    gui.add( hsb.parameters );
+    gui.add( custom.parameters );
     gui.add( invertfrag.parameters  );
     gui.add( borderfrag.parameters  );
     gui.add( eSide.set("eraser side", 20, 0,50 )  );
@@ -94,12 +96,8 @@ void ofApp::update(){
         fbo.end();
         
         mirror.apply( fbo );
-        if( ! invertfrag.active ){
-            mono.apply( fbo );
-            hsb.apply( fbo );          
-        }else{
-            invertfrag.apply( fbo );
-        }
+        invertfrag.apply( fbo );
+        custom.apply( fbo );    
             
     }
 }

@@ -55,21 +55,19 @@ class ofApp : public ofBaseApp{
         ofVideoGrabber cam;
         
         ofFbo fbo;
+
         ofx::dotfrag::Mirror mirror;
-        ofx::dotfrag::Monochrome mono;
-        ofx::dotfrag::HSB hsb;
         
         ofx::dotfrag::Live invertfrag;
         ofParameterGroup invert;
-        ofParameter<bool> iActive;
-        ofParameter<float> iLow;
-        ofParameter<float> iHigh;
-        ofParameter<float> iBorder;
+        ofParameter<float> u_low;
+        ofParameter<float> u_high;
         
-        ofColor alt;
-
+        ofx::dotfrag::Live custom;
+        
         ofx::dotfrag::Live borderfrag;
-        
+        ofParameter<float> u_border;
+
         ofxPanel gui;
         
         ofParameter<int> cx;
@@ -83,6 +81,7 @@ class ofApp : public ofBaseApp{
         ofParameter<int> cMode;
         
         int cutx, cuty;
+        ofColor alt; 
         
         void offcut();
         
