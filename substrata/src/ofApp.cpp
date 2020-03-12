@@ -112,7 +112,7 @@ void ofApp::setup(){
     limiter.ch(0) >> engine.audio_out(0);
     limiter.ch(1) >> engine.audio_out(1);
  
-    std::vector<std::string> addresses = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" };
+    std::vector<std::string> addresses = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g" };
 
     // OSC mapping -----------------------------
     osc.linkTempo( "/orca/bpm" );
