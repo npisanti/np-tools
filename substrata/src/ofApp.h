@@ -44,6 +44,7 @@
 #include "NoiseDevice.h"
 #include "SinePercussion.h"
 #include "WaveSynth.h"
+#include "Partial.h"
 
 class ofApp : public ofBaseApp{
 
@@ -82,7 +83,7 @@ class ofApp : public ofBaseApp{
         np::synth::FMSub sub;
         np2::synth::NoiseDevice noise;
         np2::synth::SinePercussion zap;
-        np2::synth::WaveSynth synths;
+        np2::synth::Partial synths;
     
         np::tuning::ModalTable table;
  
