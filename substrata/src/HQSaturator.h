@@ -42,8 +42,6 @@ private:
     pdsp::ParameterGain    inputGain;
     pdsp::ParameterGain    outputGain;
 
-    pdsp::IIRUpSampler2x upsampler;
-    pdsp::IIRDownSampler2x downsampler; 
     pdsp::Saturator2 saturator;
 };
     

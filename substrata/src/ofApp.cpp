@@ -50,10 +50,8 @@ void ofApp::setup(){
 
     clipControl >> clip0.in_threshold();
     clipControl >> clip1.in_threshold();
-    clip0.setOversampleLevel(2);
-    clip1.setOversampleLevel(2);
-    upsampler0 >> clip0 >> downsampler0 >> clipOutput.ch(0) >> limiter.ch(0);
-    upsampler1 >> clip1 >> downsampler1 >> clipOutput.ch(1) >> limiter.ch(1);
+    clip0 >> clipOutput.ch(0) >> limiter.ch(0);
+    clip1 >> clipOutput.ch(1) >> limiter.ch(1);
     
     std::cout<< "[ substrata ] initializating samplers ";
     
@@ -102,12 +100,10 @@ void ofApp::setup(){
     sub >> limiter.ch(0);
     sub >> limiter.ch(1);
 
-    zap >> upsampler0;
-    zap >> upsampler1;
-    noise.out("L") >> upsampler0;
-    noise.out("R") >> upsampler1;
-
-    //table.tonalControl >> sub.in("modulator");
+    zap >> clip0;
+    zap >> clip1;
+    noise.out("L") >> clip0;
+    noise.out("R") >> clip1;
     
     limiter.ch(0) >> engine.audio_out(0);
     limiter.ch(1) >> engine.audio_out(1);

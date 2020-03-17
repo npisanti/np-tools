@@ -90,11 +90,7 @@ class ofApp : public ofBaseApp{
  
         // stereo clipper
         pdsp::SoftClip clip0;
-        pdsp::IIRUpSampler2x upsampler0;
-        pdsp::IIRDownSampler2x downsampler0; 
         pdsp::SoftClip clip1;
-        pdsp::IIRUpSampler2x upsampler1;
-        pdsp::IIRDownSampler2x downsampler1; 
         pdsp::ParameterGain clipOutput; 
      
         //pdsp::ParameterAmp enableReverb;
@@ -108,9 +104,10 @@ class ofApp : public ofBaseApp{
         pdsp::Parameter clipControl;
         pdsp::Parameter gainControl;
    
+        np::dynamics::StereoSoftClip samplersBus;
+        
         np::dynamics::Brickwall limiter;
         
-        np::dynamics::StereoSoftClip samplersBus;
         
         bool bDrawGui;
         

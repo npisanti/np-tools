@@ -70,8 +70,7 @@ void substrata::Sampler::patch (){
     outputGainStage >> pan;
     outputGainStage >> rms;
 
-    clip.setOversampleLevel(2);
-    inputGainStage >> upsampler >> clip >> downsampler >> outputGainStage;
+    inputGainStage >> clip >> outputGainStage;
     inputControl >> inputGainStage.in_mod();
     outputControl >> outputGainStage.in_mod();
 

@@ -91,8 +91,6 @@ private:
     pdsp::DBtoLin inputControl;
     pdsp::Amp inputGainStage;
     pdsp::SoftClip clip;
-    pdsp::IIRUpSampler2x upsampler;
-    pdsp::IIRDownSampler2x downsampler; 
     pdsp::Amp outputGainStage; 
     pdsp::DBtoLin outputControl;    
     

@@ -26,9 +26,8 @@ void np2::effect::HQSaturator::patch(){
     addModuleInput( "signal", inputGain );
     addModuleOutput( "signal", outputGain );
     
-    saturator.setOversampleLevel(2);
     
-    inputGain >> upsampler >> saturator >> downsampler >> outputGain;
+    inputGain >> saturator >> outputGain;
     
     parameters.setName( "saturator" );
     parameters.add( inputGain.set("input dB", 0, -48, 48) );
