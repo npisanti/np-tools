@@ -36,6 +36,7 @@ public:
         pdsp::FMOperator        oscillator;
         pdsp::Amp               voiceAmp;
         pdsp::Amp               multAmp;
+        pdsp::Amp               fmAmp;
 
         pdsp::AHR           envelope;      
                 

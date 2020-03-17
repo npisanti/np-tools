@@ -7,13 +7,17 @@
 
 void np2::synth::Partial::setup( std::string path ){
    // -------------- SYNTH ------------------------------
-    voices.resize( 8 );
+    voices.resize( 16 );
     
     for( size_t i=0; i<voices.size(); ++i ){
         voices[i].setup( *this );
         
         voices[i].pan.out_L() >> gain.ch(0); 
         voices[i].pan.out_R() >> gain.ch(1);
+    }
+
+	for( size_t i=1; i<voices.size(); ++i ){
+		voices[i-1].out("fm") >> voices[i].in("fm");
     }
     
     parameters.setName( "wavetable_synths" );
@@ -24,18 +28,25 @@ void np2::synth::Partial::setup( std::string path ){
 
 void np2::synth::Partial::oscMapping( pdsp::osc::Input & osc, np::tuning::ModalTable * table ){
     
-    
     for( size_t i=0; i<voices.size(); ++i ){
         std::string address;
         switch( i ){
-            case 0: address = "/h"; break;
-            case 1: address = "/i"; break;
-            case 2: address = "/j"; break;
-            case 3: address = "/k"; break;
-            case 4: address = "/l"; break;
-            case 5: address = "/m"; break;
-            case 6: address = "/n"; break;
-            case 7: address = "/o"; break;
+            case 0: address = "/q"; break;
+            case 1: address = "/w"; break;
+            case 2: address = "/r"; break;
+            case 3: address = "/y"; break;
+            case 4: address = "/u"; break;
+            case 5: address = "/i"; break;
+            case 6: address = "/o"; break;
+            case 7: address = "/p"; break;
+            case 8: address = "/g"; break;
+            case 9: address = "/h"; break;
+            case 10: address = "/j"; break;
+            case 11: address = "/k"; break;
+            case 12: address = "/l"; break;
+            case 13: address = "/v"; break;
+            case 14: address = "/n"; break;
+            case 15: address = "/m"; break;
             
             default: address = "/boh"; break;
         }
@@ -51,11 +62,14 @@ void np2::synth::Partial::Voice::setup(Partial & m){
 
     addModuleInput("trig", envelope.in_trig());
     addModuleInput("pitch", oscillator.in_pitch());
-    addModuleOutput("signal", voiceAmp);
+    addModuleInput("fm", fmAmp );
+    addModuleOutput("signal", multAmp);
+    addModuleOutput("fm", voiceAmp);
 
     // SIGNAL PATH
-    oscillator >> multAmp  >> voiceAmp >> pan;
-    
+    oscillator >> voiceAmp  >> multAmp >> pan;
+
+    fmAmp >> oscillator.in_fm(); 
     // MODULATIONS AND CONTROL
 
     envelope >> voiceAmp.in_mod();
@@ -79,33 +93,35 @@ void np2::synth::Partial::Voice::oscMapping( pdsp::osc::Input & osc, std::string
         int o = i / table->degrees;
         p += o*12.0f;
         return p;
-    };       
-    
-    osc.out_value( address, 1 ) >> oscillator.in_ratio(); 
-    osc.parser( address, 1 ) = [&, table]( float value ) noexcept {
-        if( value==0.0f ) return 1.0f;
-	return value;
-    }; 
-
-    osc.out_value( address, 2 ) >> multAmp.in_mod();
-    osc.parser( address, 2 ) = [&]( float value ) noexcept {
-	if( value == 0.0f ) return 1.0f;
-        return 1.0f/value;
     };      
+    
+    osc.out_value( address, 1 ) >> multAmp.in_mod();
+    osc.parser( address, 1 ) = [&]( float value ) noexcept {
+	if( value == 0.0f ) return 0.0f;
+        return 1.0f/value;
+    };
 
-    osc.out_trig( address, 3 ) >> envelope.in_trig();
-    osc.out_trig( address, 3 ) >> envelope.in_attack();
-    osc.parser( address , 3) = [&]( float value ) noexcept {
+    osc.out_value( address, 2 ) >> oscillator.in_ratio(); 
+    osc.parser( address, 2 ) = [&, table]( float value ) noexcept {
+    	if( value==0.0f ) return 0.5f;
+		return value;
+    };
+
+	osc.out_value( address, 3 ) * 0.25 >> fmAmp.in_mod();
+
+    osc.out_trig( address, 4 ) >> envelope.in_trig();
+    osc.out_trig( address, 4 ) >> envelope.in_attack();
+    osc.parser( address , 4) = [&]( float value ) noexcept {
         return 1.0f + value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
     };
     
-    osc.out_trig( address, 4 ) >> envelope.in_release();
-    osc.parser( address , 4) = [&]( float value ) noexcept {
+    osc.out_trig( address, 5 ) >> envelope.in_release();
+    osc.parser( address , 5) = [&]( float value ) noexcept {
         return 5.0f + value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
     };
 
-    osc.out_value( address, 5 ) >> pan.in_pan();
-    osc.parser(address, 5) = [&]( float value ) noexcept {
+    osc.out_value( address, 6 ) >> pan.in_pan();
+    osc.parser(address, 6) = [&]( float value ) noexcept {
         int pan = value;
         if( pan > 9 ) pan = 9;
         switch( pan ){
