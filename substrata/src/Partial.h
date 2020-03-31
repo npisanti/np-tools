@@ -37,6 +37,7 @@ public:
         pdsp::Amp               voiceAmp;
         pdsp::Amp               multAmp;
         pdsp::Amp               fmAmp;
+        pdsp::Amp               upAmp;
 
         pdsp::AHR           envelope;      
                 

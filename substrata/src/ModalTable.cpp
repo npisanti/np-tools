@@ -44,16 +44,16 @@ void np::tuning::ModalTable::recalculate(){
 
 void np::tuning::ModalTable::oscMapping( pdsp::osc::Input & osc ){
     for( int index=0; index<TABLE_DEGREES; ++index ){
-        osc.parser( "/t", index*2 ) = [&, index]( float value ) noexcept {
+        osc.parser( "/p", index*2 ) = [&, index]( float value ) noexcept {
             ratios[index].numerator = value;
             return pdsp::osc::Ignore;
         };
-        osc.parser( "/t", index*2 +1 ) = [&, index]( float value ) noexcept {
+        osc.parser( "/p", index*2 +1 ) = [&, index]( float value ) noexcept {
             ratios[index].denominator = value;
             return pdsp::osc::Ignore;
         };
     }
-    osc.parser( "/t", TABLE_DEGREES*2 ) = [&]( float value ) noexcept {
+    osc.parser( "/p", TABLE_DEGREES*2 ) = [&]( float value ) noexcept {
         base = 24+value;
         recalculate();
         return pdsp::osc::Ignore;
