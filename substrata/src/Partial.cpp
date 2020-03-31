@@ -105,31 +105,31 @@ void np2::synth::Partial::Voice::oscMapping( pdsp::osc::Input & osc, std::string
         p += o*12.0f;
         return p;
     };      
-    
-    osc.out_value( address, 1 ) >> multAmp.in_mod();
-    osc.parser( address, 1 ) = [&]( float value ) noexcept {
-	if( value == 0.0f ) return 0.0f;
-        return 1.0f/value;
-    };
 
-    osc.out_value( address, 2 ) >> oscillator.in_ratio(); 
-    osc.parser( address, 2 ) = [&, table]( float value ) noexcept {
+    osc.out_value( address, 1 ) >> oscillator.in_ratio(); 
+    osc.parser( address, 1 ) = [&, table]( float value ) noexcept {
     	if( value==0.0f ) return 0.5f;
 		return value;
     };
 
-	osc.out_value( address, 3 ) * 0.25 >> fmAmp.in_mod();
-	osc.out_value( address, 4 ) * 0.25 >> upAmp.in_mod();
+	osc.out_value( address, 2 ) * 0.25 >> fmAmp.in_mod();
+	osc.out_value( address, 3 ) * 0.25 >> upAmp.in_mod();
 
-    osc.out_trig( address, 5 ) >> envelope.in_trig();
-    osc.out_trig( address, 5 ) >> envelope.in_attack();
-    osc.parser( address , 5) = [&]( float value ) noexcept {
+    osc.out_trig( address, 4 ) >> envelope.in_trig();
+    osc.out_trig( address, 4 ) >> envelope.in_attack();
+    osc.parser( address , 4) = [&]( float value ) noexcept {
         return 1.0f + value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
     };
     
-    osc.out_trig( address, 6 ) >> envelope.in_release();
-    osc.parser( address , 6) = [&]( float value ) noexcept {
+    osc.out_trig( address, 5 ) >> envelope.in_release();
+    osc.parser( address , 5) = [&]( float value ) noexcept {
         return 5.0f + value * pdsp::Clockable::getOneBarTimeMs() * (1.0f/16.0f);
+    };
+
+    osc.out_value( address, 6 ) >> multAmp.in_mod();
+    osc.parser( address, 6 ) = [&]( float value ) noexcept {
+	if( value == 0.0f ) return 0.0f;
+        return 1.0f/value;
     };
 
     osc.out_value( address, 7 ) >> pan.in_pan();

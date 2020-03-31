@@ -75,8 +75,8 @@ void ofApp::setup(){
     std::cout<<"\n";
     
     if(bUseIR){
-        synths.gain.ch(0) * dB( -12.0f ) >> reverbSend.ch(0);
-        synths.gain.ch(1) * dB( -12.0f ) >> reverbSend.ch(1);
+        synths.gain.ch(0) >> reverbSend.ch(0);
+        synths.gain.ch(1) >> reverbSend.ch(1);
         sub * dB(-30.0f) >> reverbSend.ch(0);
         sub * dB(-30.0f) >> reverbSend.ch(1);
         zap * dB(-36.0f) >> reverbSend.ch(0);
