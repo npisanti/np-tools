@@ -25,7 +25,7 @@ np::tuning::ModalTable::ModalTable(){
     degrees = TABLE_DEGREES;
    
     for( int i=0; i<TABLE_DEGREES; ++i ){
-        ratios[i].numerator = i + 12;
+        ratios[i].numerator = i*2 + 12;
         ratios[i].denominator = 12;
     }
     base = 29;
@@ -43,17 +43,17 @@ void np::tuning::ModalTable::recalculate(){
 }
 
 void np::tuning::ModalTable::oscMapping( pdsp::osc::Input & osc ){
-    for( int index=0; index<TABLE_DEGREES; ++index ){
-        osc.parser( "/p", index*2 ) = [&, index]( float value ) noexcept {
+    for( int index=1; index<TABLE_DEGREES; ++index ){
+        osc.parser( "/p", (index-1)*2 ) = [&, index]( float value ) noexcept {
             ratios[index].numerator = value;
             return pdsp::osc::Ignore;
         };
-        osc.parser( "/p", index*2 +1 ) = [&, index]( float value ) noexcept {
+        osc.parser( "/p", (index-1)*2 +1 ) = [&, index]( float value ) noexcept {
             ratios[index].denominator = value;
             return pdsp::osc::Ignore;
         };
     }
-    osc.parser( "/p", TABLE_DEGREES*2 ) = [&]( float value ) noexcept {
+    osc.parser( "/p", (TABLE_DEGREES-1)*2 ) = [&]( float value ) noexcept {
         base = 24+value;
         recalculate();
         return pdsp::osc::Ignore;
